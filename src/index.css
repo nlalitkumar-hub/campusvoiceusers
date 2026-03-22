@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 270 100% 98%;
+    --foreground: 215 25% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 10%;
+
+    --primary: 263 70% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 271 91% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 270 100% 98%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 271 91% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 263 70% 58%;
+
+    --radius: 0.75rem;
+
+    /* CampusVoice custom tokens */
+    --cv-indigo: 263 70% 58%;
+    --cv-indigo-dark: 263 70% 46%;
+    --cv-blue: 263 70% 58%;
+    --cv-green: 160 84% 39%;
+    --cv-amber: 38 92% 50%;
+    --cv-red: 0 84% 60%;
+    --cv-slate-50: 210 40% 98%;
+    --cv-slate-100: 210 40% 96%;
+    --cv-slate-200: 214 32% 91%;
+    --cv-slate-500: 215 16% 47%;
+    --cv-slate-600: 215 19% 35%;
+    --cv-slate-700: 215 25% 27%;
+    --cv-slate-800: 215 28% 17%;
+    --cv-slate-900: 215 25% 10%;
+
+    --shadow-card: 0 0 0 1px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.02), 0 10px 15px -3px rgba(0,0,0,0.03);
+    --shadow-card-hover: 0 0 0 1px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.04), 0 20px 25px -5px rgba(0,0,0,0.05);
+    --shadow-indigo: 0 10px 25px -5px hsl(263 70% 58% / 0.25);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.01em;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  .shadow-card-hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+  .shadow-indigo {
+    box-shadow: var(--shadow-indigo);
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
