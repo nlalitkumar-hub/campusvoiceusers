@@ -13,6 +13,7 @@ import Profile from "@/pages/Profile";
 import MyComplaints from "@/pages/MyComplaints";
 import Analytics from "@/pages/Analytics";
 import Leaderboard from "@/pages/Leaderboard";
+import FacultyDashboard from "@/pages/FacultyDashboard";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/my-complaints" element={<ProtectedRoute><MyComplaints /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+            <Route path="/faculty-dashboard" element={<ProtectedRoute><FacultyDashboard /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

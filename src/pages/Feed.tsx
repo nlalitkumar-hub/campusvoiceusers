@@ -67,7 +67,7 @@ const Feed: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const apiFilter = filter === 'trending' ? 'all' : filter;
-      const response = await fetch(`http://localhost:5001/api/complaints?filter=${apiFilter}`, {
+      const response = await fetch(`http://localhost:5000/api/complaints?filter=${apiFilter}`, {
         headers: { 'Content-Type': 'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) }
       });
       const json = await response.json();
@@ -186,6 +186,18 @@ const Feed: React.FC = () => {
         }}
         onCloseNotifications={() => setShowNotifications(false)}
       />
+
+      {/* Faculty Dashboard shortcut */}
+      {user?.role === 'faculty' && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 16px', background: 'white', borderBottom: '1px solid #F3F4F6' }}>
+          <button
+            onClick={() => navigate('/faculty-dashboard')}
+            style={{ padding: '6px 14px', background: '#7C3AED', color: 'white', border: 'none', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Dashboard
+          </button>
+        </div>
+      )}
 
       {/* Search bar */}
       {showSearch && (

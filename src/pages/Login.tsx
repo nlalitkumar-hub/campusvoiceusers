@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, CheckCircle2, Mail, User, CreditCard, Building2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-const API = 'http://localhost:5001/api';
+const API = 'http://localhost:5000/api';
 
 const isNetworkError = (err: any) =>
   err instanceof TypeError && (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Failed'));
@@ -31,6 +31,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
+  const [otpForTesting, setOtpForTesting] = useState('');
 
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -78,6 +79,7 @@ const Login: React.FC = () => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Failed to send OTP');
+      setOtpForTesting(data.data?.otp || '');
       setOtp(['', '', '', '', '', '']); setIsDirectLogin(false);
       setStep('otp');
     } catch (err: any) {
@@ -109,6 +111,7 @@ const Login: React.FC = () => {
       setInstitute(userData.institute || ''); setEmail(normalizedEmail);
       localStorage.setItem('campusvoice_role', userData.role || 'student');
       setIsDirectLogin(true); setOtp(['', '', '', '', '', '']);
+      setOtpForTesting(data.data?.otp || '');
       setStep('otp');
     } catch (err: any) {
       if (isNetworkError(err)) setDirectLoginError('Server is offline. Please start the backend.');
@@ -135,7 +138,8 @@ const Login: React.FC = () => {
         if (!token) throw new Error('No token received');
         const userObj = { id: normalizedEmail, name: userData?.name || name.trim(), email: normalizedEmail, collegeId: userData?.collegeId || collegeId.trim(), institute: userData?.institute || institute.trim(), role: (userData?.role || role) as 'student' | 'faculty', points: userData?.points || 0, level: userData?.level || 1, badges: userData?.badges || [] };
         localStorage.setItem('token', token); login(userObj); setSuccess(true);
-        setTimeout(() => navigate('/feed'), 800);
+        const destRole = userData?.role || role;
+        setTimeout(() => navigate(destRole === 'faculty' ? '/faculty-dashboard' : '/feed'), 800);
       } else { throw new Error(data.message || 'Invalid OTP'); }
     } catch (err: any) {
       if (isNetworkError(err)) { setError('Server is offline. Please start the backend.'); setLoading(false); return; }
@@ -155,13 +159,13 @@ const Login: React.FC = () => {
           await deleteDoc(doc(db, 'otps', normalizedEmail));
           localStorage.setItem('token', 'firebase_' + normalizedEmail);
           login({ ...fullUser, role: fullUser.role as 'student' | 'faculty' });
-          setSuccess(true); setTimeout(() => navigate('/feed'), 800);
+          setSuccess(true); setTimeout(() => navigate(fullUser.role === 'faculty' ? '/faculty-dashboard' : '/feed'), 800);
         } else {
           await setDoc(doc(db, 'users', normalizedEmail), { name: name.trim(), collegeId: collegeId.trim(), institute: institute.trim(), email: normalizedEmail, role: resolvedRole, isVerified: true, points: 0, level: 1, levelTitle: 'Newcomer', badges: [], complaintsRaised: 0, createdAt: new Date().toISOString() }, { merge: true });
           await deleteDoc(doc(db, 'otps', normalizedEmail));
           const userObj = { id: normalizedEmail, name: name.trim(), email: normalizedEmail, collegeId: collegeId.trim(), institute: institute.trim(), role: resolvedRole as 'student' | 'faculty', points: 0, level: 1, badges: [] };
           localStorage.setItem('token', 'firebase_' + normalizedEmail); login(userObj); setSuccess(true);
-          setTimeout(() => navigate('/feed'), 800);
+          setTimeout(() => navigate(resolvedRole === 'faculty' ? '/faculty-dashboard' : '/feed'), 800);
         }
       } catch { setError('Verification failed. Please try again.'); }
     } finally { setLoading(false); }
@@ -376,7 +380,11 @@ const Login: React.FC = () => {
                 </p>
               </div>
 
-              
+              {otpForTesting && (
+                <div style={{ backgroundColor: '#FEF3C7', border: '1px solid #F59E0B', borderRadius: '8px', padding: '12px', marginTop: '8px', textAlign: 'center' }}>
+                  <p style={{ fontWeight: 'bold', color: '#92400E', fontSize: '16px' }}>Test OTP: {otpForTesting}</p>
+                </div>
+              )}
 
               <div className="flex justify-between gap-1.5 mb-5">
                 {[0, 1, 2, 3, 4, 5].map(i => (

@@ -8,6 +8,7 @@ import complaintRoutes from './routes/complaint.routes'
 import profileRoutes from './routes/profile.routes'
 import analyticsRoutes from './routes/analytics.routes'
 import notificationRoutes from './routes/notification.routes'
+import facultyRoutes from './routes/faculty.routes'
 import { errorHandler } from './middleware/errorHandler'
 import { checkOverdueComplaints } from './services/deadline.service'
 
@@ -40,6 +41,7 @@ app.use('/api/complaints', complaintRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/analytics', analyticsRoutes)
 app.use('/api/notifications', notificationRoutes)
+app.use('/api/faculty', facultyRoutes)
 
 app.use('/{*path}', (req, res) => { res.status(404).json({ success: false, message: 'Route not found' }) })
 app.use(errorHandler)

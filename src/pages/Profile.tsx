@@ -21,7 +21,7 @@ const Profile: React.FC = () => {
         const token = localStorage.getItem('token') || '';
         if (token && !token.startsWith('firebase_') && token.length > 20) {
           try {
-            const res = await fetch('http://localhost:5001/api/profile', {
+            const res = await fetch('http://localhost:5000/api/profile', {
               headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
             });
             if (res.ok) {

@@ -22,7 +22,7 @@ const Analytics: React.FC = () => {
       try {
         const token = localStorage.getItem('token');
         if (token && !token.startsWith('firebase_')) {
-          const res = await fetch('http://localhost:5001/api/analytics/summary', {
+          const res = await fetch('http://localhost:5000/api/analytics/summary', {
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
           });
           if (res.ok) {
@@ -81,7 +81,7 @@ const Analytics: React.FC = () => {
       try {
         const token = localStorage.getItem('token');
         if (token && !token.startsWith('firebase_')) {
-          const res = await fetch('http://localhost:5001/api/analytics/personal', {
+          const res = await fetch('http://localhost:5000/api/analytics/personal', {
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
           });
           if (res.ok) {

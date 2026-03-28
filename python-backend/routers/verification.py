@@ -135,19 +135,20 @@ async def verify_image(request: VerifyRequest):
             "error":"Invalid Description",
             "message":"Description is invalid or meaningless. Please describe the actual issue clearly."})
 
-    # Gate 1: Privacy — primary model
+    # Gate 1: Privacy — primary model (only block high-confidence detections)
     print("[1] Privacy Gate")
     p_preds = _preds(_run(b64, _detect_spec(PRIVACY_MODEL)))
-    persons = [p for p in p_preds if p.get("class","").lower()=="person" and p.get("confidence",0)>0.4]
+    persons = [p for p in p_preds if p.get("class","").lower()=="person" and p.get("confidence",0)>0.7]
     blocked = len(persons) > 0
 
-    # Gate 1b: COCO fallback person detection
+    # Gate 1b: COCO fallback — only block if person dominates the frame
     coco_preds = _preds(_run(b64, _detect_spec(COCO_MODEL)))
     if not blocked:
-        coco_p = [p for p in coco_preds if p.get("class","").lower()=="person" and p.get("confidence",0)>0.4]
+        coco_p = [p for p in coco_preds if p.get("class","").lower()=="person" and p.get("confidence",0)>0.6]
         ratio = _person_ratio(coco_preds)
         print(f"    COCO persons={len(coco_p)} ratio={ratio:.3f}")
-        blocked = len(coco_p) > 0 and (ratio > 0.25 or max((p.get("confidence",0) for p in coco_p), default=0) > 0.6)
+        # Only block if person covers >40% of frame (clearly a selfie, not background)
+        blocked = len(coco_p) > 0 and ratio > 0.40
 
     if blocked:
         print("[1] REJECTED privacy")

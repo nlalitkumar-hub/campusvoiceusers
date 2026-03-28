@@ -6,6 +6,7 @@ import { ApiError } from '../utils/ApiError'
 import { uploadBase64Image } from '../services/cloudinary.service'
 import { verifyComplaint as aiVerify } from '../services/ai.service'
 import { updateUserPoints, POINTS } from '../services/gamification.service'
+import { sendStatusNotification } from '../services/notification.service'
 
 export const getComplaints = asyncHandler(async (req: Request, res: Response) => {
   const filter = (req.query.filter as string) || 'all'
@@ -172,4 +173,80 @@ export const addComment = asyncHandler(async (req: Request, res: Response) => {
   const commentData = { id: commentRef.id, complaintId: id, userId: req.user!.id, userName: req.user!.email, text: text.trim(), createdAt: new Date().toISOString() }
   await commentRef.set(commentData)
   return res.status(201).json(new ApiResponse(201, commentData, 'Comment added'))
+})
+
+export const facultyReopenComplaint = asyncHandler(async (req: Request, res: Response) => {
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id as string
+  if (!id) throw new ApiError(400, 'Complaint ID required')
+  const { reason, evidence, facultyName, facultyEmail } = req.body
+
+  if (req.user!.role !== 'faculty') throw new ApiError(403, 'Only faculty members can reopen complaints')
+  if (!reason || !evidence?.trim()) throw new ApiError(400, 'Reason and evidence are required')
+
+  const complaintRef = db.collection('complaints').doc(id)
+  const complaintDoc = await complaintRef.get()
+  if (!complaintDoc.exists) throw new ApiError(404, 'Complaint not found')
+
+  const complaintData = complaintDoc.data()!
+  if (complaintData.status !== 'resolved') throw new ApiError(400, 'Only resolved complaints can be reopened')
+
+  const now = new Date().toISOString()
+  await complaintRef.update({
+    status: 'in_progress',
+    isFacultyReopened: true,
+    facultyReopenReason: reason,
+    facultyReopenEvidence: evidence.trim(),
+    facultyReopenedBy: req.user!.id,
+    facultyReopenedByName: facultyName || req.user!.email,
+    facultyReopenedAt: now,
+    isEscalated: true,
+    escalationLevel: 3,
+    resolutionImageUrl: null,
+    resolutionNote: null,
+    resolvedAt: null,
+    daysToResolve: null,
+    deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+    deadlineDays: 3,
+    daysRemaining: 3,
+    isOverdue: false,
+    updatedAt: now
+  })
+
+  console.log(`✅ Faculty reopen: ${id} by ${req.user!.id}`)
+
+  await db.collection('notifications').add({
+    title: '🚨 Faculty Reopen — Immediate Action Required',
+    message: `Faculty ${facultyName || req.user!.email} has reopened complaint "${complaintData.title}". Reason: ${reason.replace(/_/g, ' ')}. Evidence: ${evidence.trim()}`,
+    type: 'faculty_reopen',
+    complaintId: id,
+    complaintTitle: complaintData.title,
+    priority: 'CRITICAL',
+    facultyEmail: req.user!.id,
+    facultyName: facultyName || req.user!.email,
+    reason,
+    evidence: evidence.trim(),
+    sentAt: now,
+    targetAudience: 'authorities',
+    isRead: false
+  })
+
+  if (complaintData.submittedBy) {
+    await sendStatusNotification(id, String(complaintData.submittedBy || ''), 'in_progress', String(complaintData.title || '')).catch(console.error)
+  }
+
+  await updateUserPoints(req.user!.id, 5).catch(console.error)
+
+  const updated = await complaintRef.get()
+  return res.status(200).json(new ApiResponse(200, { id, ...updated.data() }, 'Complaint reopened and escalated successfully'))
+})
+
+export const getEscalatedComplaints = asyncHandler(async (req: Request, res: Response) => {
+  const snapshot = await db.collection('complaints').where('isFacultyReopened', '==', true).get()
+  const escalated = snapshot.docs
+    .map((d: any) => ({ id: d.id, ...d.data() }))
+    .filter((c: any) => c.status !== 'resolved' && c.status !== 'rejected')
+    .sort((a: any, b: any) =>
+      new Date(b.facultyReopenedAt || 0).getTime() - new Date(a.facultyReopenedAt || 0).getTime()
+    )
+  return res.status(200).json(new ApiResponse(200, { escalated, total: escalated.length }, 'Escalated complaints fetched'))
 })

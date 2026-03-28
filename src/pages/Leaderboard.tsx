@@ -186,8 +186,8 @@ const Leaderboard: React.FC = () => {
                   >
                     {/* Rank */}
                     <div
-                      className="w-8 flex justify-center font-black text-lg italic shrink-0"
-                      style={{ color: isMe ? '#7C3AED' : '#4a4455' }}
+                      className="w-8 flex justify-center font-bold text-lg shrink-0"
+                      style={{ color: isMe ? '#7C3AED' : '#4a4455', fontFamily: 'Inter, Arial, sans-serif', fontStyle: 'normal' }}
                     >
                       {i + 1}
                     </div>

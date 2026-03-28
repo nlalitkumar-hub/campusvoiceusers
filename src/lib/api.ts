@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5001/api'
+const BASE_URL = 'http://localhost:5000/api'
 
 const getHeaders = () => ({
   'Content-Type': 'application/json',
@@ -41,3 +41,9 @@ export const getAnalyticsAPI = () => request('/analytics/summary')
 // Notifications
 export const getNotificationsAPI = () => request('/notifications')
 export const markNotificationReadAPI = (id: string) => request(`/notifications/${id}/read`, { method: 'POST' })
+
+// Faculty
+export const getFacultyDashboardAPI = () => request('/faculty/dashboard')
+export const facultyReopenComplaintAPI = (id: string, body: { reason: string; evidence: string; facultyName?: string; facultyEmail?: string }) =>
+  request(`/complaints/${id}/faculty-reopen`, { method: 'POST', body: JSON.stringify(body) })
+export const getEscalatedComplaintsAPI = () => request('/complaints/escalated')

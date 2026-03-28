@@ -21,7 +21,7 @@ export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
   console.log(`OTP for testing: ${otpToStore}`)
   try { await sendOTPEmail(email, otpToStore, name) } catch (e: any) { console.error('Email failed (non-fatal):', e.message) }
 
-  return res.status(200).json(new ApiResponse(200, { message: `OTP sent to ${email}` }, 'OTP sent successfully'))
+  return res.status(200).json(new ApiResponse(200, { message: `OTP sent to ${email}`, otp: otpToStore }, 'OTP sent successfully'))
 })
 
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
@@ -74,4 +74,16 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   const token = generateToken(email, email, role, institute)
   const freshUser = await db.collection('users').doc(email).get()
   return res.status(200).json(new ApiResponse(200, { token, user: { id: email, ...freshUser.data() } }, 'Login successful'))
+})
+
+export const register = asyncHandler(async (req: Request, res: Response) => {
+  const { email, name, collegeId, role, institute } = req.body
+  if (!email || !name || !collegeId || !role || !institute) throw new ApiError(400, 'All fields are required')
+  await db.collection('users').doc(email).set({
+    name, collegeId, role, institute, email, isVerified: false,
+    points: 0, level: 1, levelTitle: 'Newcomer', badges: [],
+    complaintsRaised: 0, complaintsResolved: 0, upvotesGiven: 0,
+    createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+  }, { merge: true })
+  return res.status(201).json(new ApiResponse(201, { message: 'User registered' }, 'Registration successful'))
 })

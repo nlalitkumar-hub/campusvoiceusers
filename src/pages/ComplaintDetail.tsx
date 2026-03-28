@@ -33,6 +33,16 @@ const ComplaintDetail: React.FC = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [submitterName, setSubmitterName] = useState<string>('');
 
+  // Faculty reopen state
+  const [showReopenPanel, setShowReopenPanel] = useState(false);
+  const [reopenReason, setReopenReason] = useState('');
+  const [reopenEvidence, setReopenEvidence] = useState('');
+  const [reopening, setReopening] = useState(false);
+  const [reopenSuccess, setReopenSuccess] = useState(false);
+
+  const currentUser = JSON.parse(localStorage.getItem('campusvoice_user') || '{}');
+  const isFaculty = currentUser.role === 'faculty';
+
   const loadComplaint = async () => {
     if (!id) return;
     setLoading(true);
@@ -150,6 +160,61 @@ const ComplaintDetail: React.FC = () => {
     }
   };
 
+  const handleFacultyReopen = async () => {
+    if (!reopenReason || !reopenEvidence.trim()) return;
+    setReopening(true);
+    try {
+      const token = localStorage.getItem('token') || '';
+      try {
+        const response = await fetch(`http://localhost:5000/api/complaints/${complaint.id}/faculty-reopen`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ reason: reopenReason, evidence: reopenEvidence, facultyName: currentUser.name || currentUser.email, facultyEmail: currentUser.email || currentUser.id })
+        });
+        if (response.ok) {
+          setReopenSuccess(true);
+          setShowReopenPanel(false);
+          await loadComplaint();
+          setReopening(false);
+          return;
+        }
+      } catch (e) {
+        console.log('Backend unavailable, using Firebase');
+      }
+      // Firebase fallback
+      const { db } = await import('../lib/firebase');
+      const { doc, updateDoc, addDoc, collection } = await import('firebase/firestore');
+      await updateDoc(doc(db, 'complaints', complaint.id), {
+        status: 'in_progress',
+        isFacultyReopened: true,
+        facultyReopenReason: reopenReason,
+        facultyReopenEvidence: reopenEvidence,
+        facultyReopenedBy: currentUser.email || currentUser.id,
+        facultyReopenedByName: currentUser.name || '',
+        facultyReopenedAt: new Date().toISOString(),
+        isEscalated: true,
+        escalationLevel: 3,
+        updatedAt: new Date().toISOString()
+      });
+      await addDoc(collection(db, 'notifications'), {
+        title: '🚨 Faculty Reopen — Immediate Action Required',
+        message: `Faculty ${currentUser.name || currentUser.email} has reopened complaint "${complaint.title}". Reason: ${reopenReason}. ${reopenEvidence}`,
+        type: 'faculty_reopen',
+        complaintId: complaint.id,
+        priority: 'CRITICAL',
+        sentAt: new Date().toISOString(),
+        targetAudience: 'authorities'
+      });
+      setReopenSuccess(true);
+      setShowReopenPanel(false);
+      await loadComplaint();
+    } catch (error: any) {
+      console.error('Reopen error:', error.message);
+      alert('Failed to reopen complaint. Please try again.');
+    }
+    setReopening(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -233,9 +298,22 @@ const ComplaintDetail: React.FC = () => {
           </span>
         </p>
 
+        {/* Faculty reopened badge */}
+        {complaint?.isFacultyReopened && (
+          <div style={{ background: '#FEF3C7', border: '2px solid #F59E0B', borderRadius: '10px', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '20px' }}>⚠️</span>
+            <div>
+              <p style={{ fontWeight: 700, color: '#92400E', fontSize: '13px', margin: 0 }}>Reopened by Faculty — High Priority</p>
+              <p style={{ color: '#B45309', fontSize: '12px', margin: '2px 0 0' }}>
+                {complaint.facultyReopenedByName || complaint.facultyReopenedBy} •{' '}
+                {complaint.facultyReopenReason?.replace(/_/g, ' ')?.replace(/\b\w/g, (l: string) => l.toUpperCase())}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Actions */}
-        <div className="flex items-center gap-3">
-          <button
+        <div className="flex items-center gap-3">          <button
             onClick={handleUpvote}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
               isUpvoted ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground hover:bg-primary/5'
@@ -293,8 +371,83 @@ const ComplaintDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Satisfaction Portal */}
-        {complaint.status === 'resolved' && complaint.submittedBy === user?.id && !complaint.satisfactionRating && (
+        {/* Faculty Reopen */}
+        {complaint?.status === 'resolved' && isFaculty && (
+          <div style={{ marginTop: '16px' }}>
+            {!reopenSuccess ? (
+              <>
+                <button
+                  onClick={() => setShowReopenPanel(!showReopenPanel)}
+                  style={{ width: '100%', padding: '14px', background: showReopenPanel ? '#F3F4F6' : 'white', color: '#DC2626', border: '2px solid #EF4444', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                >
+                  <span style={{ fontSize: '18px' }}>🔄</span>
+                  {showReopenPanel ? 'Cancel Reopen' : 'Reopen This Complaint (Faculty)'}
+                </button>
+                <p style={{ fontSize: '11px', color: '#9CA3AF', textAlign: 'center', marginTop: '6px' }}>
+                  Faculty reopens are escalated immediately to authorities
+                </p>
+              </>
+            ) : (
+              <div style={{ background: '#FEF3C7', border: '2px solid #F59E0B', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px' }}>⚠️</p>
+                <p style={{ fontWeight: 700, color: '#92400E', fontSize: '15px', marginTop: '8px' }}>Complaint Reopened!</p>
+                <p style={{ color: '#B45309', fontSize: '13px', marginTop: '4px' }}>This has been escalated to authorities with HIGH PRIORITY flag.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Faculty Reopen Panel */}
+        {complaint?.status === 'resolved' && isFaculty && showReopenPanel && !reopenSuccess && (
+          <div style={{ background: 'rgba(239,68,68,0.05)', border: '2px solid #FCA5A5', borderRadius: '16px', padding: '20px', marginTop: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>🔄</div>
+              <div>
+                <p style={{ fontWeight: 700, color: '#DC2626', fontSize: '15px', margin: 0 }}>Faculty Reopen Request</p>
+                <p style={{ color: '#EF4444', fontSize: '12px', margin: 0, marginTop: '2px' }}>This will immediately flag to authorities</p>
+              </div>
+            </div>
+            <div style={{ background: '#FEF3C7', border: '1px solid #FCD34D', borderRadius: '10px', padding: '10px 14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '16px' }}>⚠️</span>
+              <p style={{ fontSize: '12px', color: '#92400E', margin: 0, fontWeight: 500 }}>Faculty reopens carry higher authority than student re-raises and cannot be dismissed without action.</p>
+            </div>
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '6px' }}>Reason for Reopening *</label>
+              <select value={reopenReason} onChange={e => setReopenReason(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid #FCA5A5', fontSize: '14px', background: 'white', color: '#111827', outline: 'none', cursor: 'pointer' }}>
+                <option value="">Select a reason...</option>
+                <option value="issue_persists">Issue still persists after resolution</option>
+                <option value="incomplete_fix">Fix was incomplete or temporary</option>
+                <option value="wrong_resolution">Wrong problem was resolved</option>
+                <option value="recurred">Problem has recurred</option>
+                <option value="safety_risk">Creates safety risk if not properly fixed</option>
+                <option value="other">Other reason</option>
+              </select>
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '6px' }}>Additional Evidence / Details *</label>
+              <textarea
+                value={reopenEvidence}
+                onChange={e => setReopenEvidence(e.target.value.slice(0, 500))}
+                placeholder="Describe why this complaint needs to be reopened. Include specific observations, affected areas, or safety concerns..."
+                rows={4}
+                style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid #FCA5A5', fontSize: '14px', background: 'white', resize: 'vertical', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+              />
+              <p style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px', textAlign: 'right' }}>{reopenEvidence.length}/500</p>
+            </div>
+            <button
+              disabled={!reopenReason || !reopenEvidence.trim() || reopening}
+              onClick={handleFacultyReopen}
+              style={{ width: '100%', padding: '14px', background: (!reopenReason || !reopenEvidence.trim() || reopening) ? '#FCA5A5' : '#EF4444', color: 'white', border: 'none', borderRadius: '10px', cursor: (!reopenReason || !reopenEvidence.trim() || reopening) ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            >
+              {reopening ? (
+                <><span style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.4)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 1s linear infinite', display: 'inline-block' }} />Escalating to Authorities...</>
+              ) : <>🔄 Reopen &amp; Escalate Immediately</>}
+            </button>
+            <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
+          </div>
+        )}
+
+        {/* Satisfaction Portal */}        {complaint.status === 'resolved' && complaint.submittedBy === user?.id && !complaint.satisfactionRating && (
           <SatisfactionPortal
             complaint={complaint}
             onSubmitRating={async (r, feedbackText) => {
@@ -305,7 +458,7 @@ const ComplaintDetail: React.FC = () => {
             onRaiseAgain={async (description) => {
               try {
                 const token = localStorage.getItem('token') || '';
-            const response = await fetch('http://localhost:5001/api/complaints/create', {
+            const response = await fetch('http://localhost:5000/api/complaints/create', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                   body: JSON.stringify({
