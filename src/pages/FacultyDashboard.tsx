@@ -49,7 +49,7 @@ const FacultyDashboard: React.FC = () => {
       const token = localStorage.getItem('token') || '';
       if (token && !token.startsWith('firebase_')) {
         try {
-          const response = await fetch('http://localhost:5000/api/faculty/dashboard', {
+          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/faculty/dashboard`, {
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
           });
           if (response.ok) {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, CheckCircle2, Mail, User, CreditCard, Building2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-const API = 'http://localhost:5000/api';
+const API = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api`;
 
 const isNetworkError = (err: any) =>
   err instanceof TypeError && (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Failed'));

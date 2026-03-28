@@ -67,7 +67,7 @@ const Feed: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const apiFilter = filter === 'trending' ? 'all' : filter;
-      const response = await fetch(`http://localhost:5000/api/complaints?filter=${apiFilter}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/complaints?filter=${apiFilter}`, {
         headers: { 'Content-Type': 'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) }
       });
       const json = await response.json();

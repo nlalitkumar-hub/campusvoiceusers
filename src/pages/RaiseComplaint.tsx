@@ -77,7 +77,7 @@ const RaiseComplaint: React.FC = () => {
     // Primary: Python AI triage backend
     try {
       const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 35000);
-      const res = await fetch('http://localhost:8000/api/verify-image', {
+      const res = await fetch(`${import.meta.env.VITE_PYTHON_AI_URL || 'http://localhost:8000'}/api/verify-image`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64, description: `${title}. ${description}`, category, location: 'Vellore Institute of Science and Technology, Chennai Campus' }),
         signal: controller.signal
@@ -95,7 +95,7 @@ const RaiseComplaint: React.FC = () => {
     // Fallback: Node backend
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch('http://localhost:5000/api/complaints/verify', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/complaints/verify`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ imageBase64, description: `${title}. ${description}`, category })
       });
@@ -123,7 +123,7 @@ const RaiseComplaint: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const base64Data = image!.replace(/^data:image\/\w+;base64,/, '');
-      const res = await fetch('http://localhost:5000/api/complaints/create', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) }, body: JSON.stringify({ ...form, imageBase64: base64Data, submittedBy: user.id, submittedByName: user.name, institute: user.institute, coordinates: userLocation }) });
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/complaints/create`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) }, body: JSON.stringify({ ...form, imageBase64: base64Data, submittedBy: user.id, submittedByName: user.name, institute: user.institute, coordinates: userLocation }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Submission failed');
       updateUser({ points: (user.points || 0) + POINT_VALUES.RAISE_COMPLAINT + POINT_VALUES.AI_VERIFIED });

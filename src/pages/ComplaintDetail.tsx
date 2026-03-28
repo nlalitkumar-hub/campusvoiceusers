@@ -166,7 +166,7 @@ const ComplaintDetail: React.FC = () => {
     try {
       const token = localStorage.getItem('token') || '';
       try {
-        const response = await fetch(`http://localhost:5000/api/complaints/${complaint.id}/faculty-reopen`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/complaints/${complaint.id}/faculty-reopen`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ reason: reopenReason, evidence: reopenEvidence, facultyName: currentUser.name || currentUser.email, facultyEmail: currentUser.email || currentUser.id })
@@ -458,7 +458,7 @@ const ComplaintDetail: React.FC = () => {
             onRaiseAgain={async (description) => {
               try {
                 const token = localStorage.getItem('token') || '';
-            const response = await fetch('http://localhost:5000/api/complaints/create', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/complaints/create`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                   body: JSON.stringify({
