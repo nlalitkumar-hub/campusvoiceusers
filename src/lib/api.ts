@@ -1,4 +1,4 @@
-const BASE_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api`
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api'
 
 const getHeaders = () => ({
   'Content-Type': 'application/json',
@@ -6,13 +6,18 @@ const getHeaders = () => ({
 })
 
 const request = async (endpoint: string, options: RequestInit = {}) => {
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers: { ...getHeaders(), ...(options.headers as Record<string, string> || {}) }
-  })
-  const data = await response.json()
-  if (!response.ok) throw new Error(data.message || 'Request failed')
-  return data
+  try {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      headers: { ...getHeaders(), ...(options.headers as Record<string, string> || {}) }
+    })
+    const data = await response.json()
+    if (!response.ok) throw new Error(data.message || 'Request failed')
+    return data
+  } catch (error: any) {
+    console.error(`API Error [${endpoint}]:`, error)
+    throw error
+  }
 }
 
 // Auth
@@ -37,6 +42,7 @@ export const getLeaderboardAPI = () => request('/profile/leaderboard')
 
 // Analytics
 export const getAnalyticsAPI = () => request('/analytics/summary')
+export const getPersonalAnalyticsAPI = () => request('/analytics/personal')
 
 // Notifications
 export const getNotificationsAPI = () => request('/notifications')
@@ -44,6 +50,6 @@ export const markNotificationReadAPI = (id: string) => request(`/notifications/$
 
 // Faculty
 export const getFacultyDashboardAPI = () => request('/faculty/dashboard')
-export const facultyReopenComplaintAPI = (id: string, body: { reason: string; evidence: string; facultyName?: string; facultyEmail?: string }) =>
+export const facultyReopenComplaintAPI = (id: string, body: object) =>
   request(`/complaints/${id}/faculty-reopen`, { method: 'POST', body: JSON.stringify(body) })
 export const getEscalatedComplaintsAPI = () => request('/complaints/escalated')

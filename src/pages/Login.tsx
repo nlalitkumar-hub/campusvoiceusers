@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, CheckCircle2, Mail, User, CreditCard, Building2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-const API = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api`;
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const isNetworkError = (err: any) =>
-  err instanceof TypeError && (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Failed'));
+  err instanceof TypeError && err.message === 'Failed to fetch';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -73,18 +73,19 @@ const Login: React.FC = () => {
     }
     setLoading(true);
     try {
-      const response = await fetch(`${API}/auth/send-otp`, {
+      const response = await fetch(`${API}/api/auth/send-otp`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim().toLowerCase(), name: name.trim(), collegeId: collegeId.trim(), role, institute: institute.trim() })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Failed to send OTP');
-      setOtpForTesting(data.data?.otp || '');
+      setOtpForTesting(data.data?.otp || data.otp || '');
       setOtp(['', '', '', '', '', '']); setIsDirectLogin(false);
       setStep('otp');
     } catch (err: any) {
-      if (isNetworkError(err)) setError('Server is offline. Please start the backend.');
-      else setError(err.message || 'Failed to send OTP. Please try again.');
+      console.error('Error:', err);
+      if (isNetworkError(err)) setError('Cannot connect to server. Please check your internet connection.');
+      else setError(err?.message || 'Something went wrong. Please try again.');
     } finally { setLoading(false); }
   };
 
@@ -101,7 +102,7 @@ const Login: React.FC = () => {
         setDirectLoginLoading(false); return;
       }
       const userData = userDoc.data();
-      const response = await fetch(`${API}/auth/send-otp`, {
+      const response = await fetch(`${API}/api/auth/send-otp`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: normalizedEmail, name: userData.name, collegeId: userData.collegeId, role: userData.role, institute: userData.institute })
       });
@@ -111,11 +112,12 @@ const Login: React.FC = () => {
       setInstitute(userData.institute || ''); setEmail(normalizedEmail);
       localStorage.setItem('campusvoice_role', userData.role || 'student');
       setIsDirectLogin(true); setOtp(['', '', '', '', '', '']);
-      setOtpForTesting(data.data?.otp || '');
+      setOtpForTesting(data.data?.otp || data.otp || '');
       setStep('otp');
     } catch (err: any) {
-      if (isNetworkError(err)) setDirectLoginError('Server is offline. Please start the backend.');
-      else setDirectLoginError('Something went wrong. Please try again.');
+      console.error('Error:', err);
+      if (isNetworkError(err)) setDirectLoginError('Cannot connect to server. Please check your internet connection.');
+      else setDirectLoginError(err?.message || 'Something went wrong. Please try again.');
     } finally { setDirectLoginLoading(false); }
   };
 
@@ -128,7 +130,7 @@ const Login: React.FC = () => {
     const normalizedEmail = email.trim().toLowerCase();
     const resolvedRole = (localStorage.getItem('campusvoice_role') || 'student') as 'student' | 'faculty';
     try {
-      const response = await fetch(`${API}/auth/verify-otp`, {
+      const response = await fetch(`${API}/api/auth/verify-otp`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: normalizedEmail, otp: enteredOTP, name: name.trim(), collegeId: collegeId.trim(), role: resolvedRole, institute: institute.trim() })
       });
@@ -142,7 +144,8 @@ const Login: React.FC = () => {
         setTimeout(() => navigate(destRole === 'faculty' ? '/faculty-dashboard' : '/feed'), 800);
       } else { throw new Error(data.message || 'Invalid OTP'); }
     } catch (err: any) {
-      if (isNetworkError(err)) { setError('Server is offline. Please start the backend.'); setLoading(false); return; }
+      console.error('Error:', err);
+      if (isNetworkError(err)) { setError('Cannot connect to server. Please check your internet connection.'); setLoading(false); return; }
       // Firebase fallback
       try {
         const { db } = await import('../lib/firebase');

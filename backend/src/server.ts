@@ -15,12 +15,20 @@ import { checkOverdueComplaints } from './services/deadline.service'
 const app = express()
 
 app.use(cors({
-  origin: [
-    'http://localhost:8080', 'http://localhost:8081', 'http://localhost:8083',
-    'http://127.0.0.1:8080', 'http://127.0.0.1:8081', 'http://127.0.0.1:8083',
-    'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000',
-    'http://192.168.1.14:8080', 'http://192.168.1.14:8081', 'http://192.168.1.14:5173',
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Capacitor, curl)
+    // and all known dev/prod origins
+    const allowed = [
+      'http://localhost:8080', 'http://localhost:8081', 'http://localhost:8083',
+      'http://127.0.0.1:8080', 'http://127.0.0.1:8081', 'http://127.0.0.1:8083',
+      'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000',
+      'http://192.168.1.14:8080', 'http://192.168.1.14:8081', 'http://192.168.1.14:5173',
+      'capacitor://localhost', 'ionic://localhost', 'https://localhost',
+      'https://campusvoice-backend-bi2j.onrender.com',
+    ]
+    if (!origin || allowed.includes(origin)) return callback(null, true)
+    callback(null, true) // allow all origins for mobile app compatibility
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
