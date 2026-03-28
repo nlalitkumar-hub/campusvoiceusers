@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CampusVoice - Alexander Sterling</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline": "#7b7487",
+              "primary-fixed": "#eaddff",
+              "on-secondary-container": "#fffbff",
+              "on-background": "#191c1d",
+              "on-primary": "#ffffff",
+              "surface-tint": "#732ee4",
+              "surface-container-lowest": "#ffffff",
+              "on-surface": "#191c1d",
+              "tertiary": "#7d3d00",
+              "on-primary-fixed": "#25005a",
+              "on-primary-fixed-variant": "#5a00c6",
+              "on-primary-container": "#ede0ff",
+              "tertiary-fixed-dim": "#ffb784",
+              "secondary-fixed": "#f0dbff",
+              "on-tertiary-fixed-variant": "#713700",
+              "surface-dim": "#d9dadb",
+              "primary": "#630ed4",
+              "surface": "#f8f9fa",
+              "surface-container": "#edeeef",
+              "on-tertiary": "#ffffff",
+              "on-surface-variant": "#4a4455",
+              "inverse-primary": "#d2bbff",
+              "outline-variant": "#ccc3d8",
+              "on-secondary-fixed": "#2c0051",
+              "inverse-on-surface": "#f0f1f2",
+              "secondary": "#8127cf",
+              "secondary-container": "#9c48ea",
+              "tertiary-container": "#a15100",
+              "inverse-surface": "#2e3132",
+              "tertiary-fixed": "#ffdcc6",
+              "surface-container-low": "#f3f4f5",
+              "surface-bright": "#f8f9fa",
+              "background": "#f8f9fa",
+              "surface-variant": "#e1e3e4",
+              "on-error": "#ffffff",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed-variant": "#6900b3",
+              "surface-container-highest": "#e1e3e4",
+              "on-error-container": "#93000a",
+              "primary-fixed-dim": "#d2bbff",
+              "on-secondary": "#ffffff",
+              "error": "#ba1a1a",
+              "secondary-fixed-dim": "#ddb7ff",
+              "primary-container": "#7c3aed",
+              "on-tertiary-fixed": "#301400",
+              "surface-container-high": "#e7e8e9",
+              "on-tertiary-container": "#ffe0cd"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body text-on-background antialiased min-h-screen flex flex-col items-center">
+<!-- TopAppBar -->
+<header class="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-100 dark:border-gray-800 fixed top-0 w-full z-50">
+<div class="flex items-center justify-between px-4 h-16 w-full max-w-md mx-auto">
+<button class="active:opacity-70 transition-opacity p-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors rounded-full">
+<span class="material-symbols-outlined text-violet-600 dark:text-violet-400" data-icon="menu">menu</span>
+</button>
+<h1 class="text-xl font-bold text-violet-600 dark:text-violet-400 font-inter text-sm antialiased">CampusVoice</h1>
+<div class="w-10"></div> <!-- Spacer for center alignment -->
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="w-full max-w-md mt-16 mb-20 px-6 pt-8 space-y-8">
+<!-- Profile Header Section -->
+<section class="flex flex-col items-center text-center space-y-4">
+<div class="relative">
+<div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
+<img alt="Alexander Sterling" class="w-full h-full object-cover" data-alt="Close-up portrait of a young man with a confident smile, stylish short hair, wearing a casual navy blue shirt in a bright campus setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcdMlVvN5TNDRLwvOmWrKpb-VPymZ2fLnQpY8w11PQbVlXn5UbRdI80-YUNROJBfL5ZduYUMCQtBn2xSO5_3LjkcFWWnArGa426EZQDa0dl1BlAkVMLsX4se2W9IOYzwU5lweG0ytyXaVhMQx0NXsB6EVE7J-9FHEk6Z0lnU-GS7Q7AxMilpKOykXdtPIF7WDgjrdwg74ylYWZNYkIUczIDXZN4uP_UYGG2ffgUveEGJPic9Sl_GfZT5mfQKmmJC_zayMRLZSySyhY"/>
+</div>
+<div class="absolute bottom-0 right-0 bg-primary-container p-1.5 rounded-full border-2 border-white">
+<span class="material-symbols-outlined text-white text-sm" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div>
+<h2 class="text-2xl font-bold tracking-tight text-on-surface">Alexander Sterling</h2>
+<p class="text-on-surface-variant font-medium text-sm">STU-2024-8891</p>
+</div>
+</section>
+<!-- Points Card (Bento Style) -->
+<section class="bg-primary-container text-on-primary-container rounded-[16px] p-6 shadow-md relative overflow-hidden">
+<div class="absolute -right-6 -top-6 opacity-20 transform rotate-12">
+<span class="material-symbols-outlined text-9xl" data-icon="military_tech">military_tech</span>
+</div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<div class="bg-white/20 px-4 py-1 rounded-full mb-3">
+<span class="text-xs font-bold uppercase tracking-wider">Campus Merit</span>
+</div>
+<h3 class="text-4xl font-extrabold mb-1">245 <span class="text-xl font-normal">pts</span></h3>
+<p class="text-sm font-semibold mb-6">Total Points</p>
+<div class="grid grid-cols-2 gap-3 w-full">
+<div class="bg-white/10 rounded-xl p-3 flex flex-col items-center justify-center backdrop-blur-sm border border-white/10">
+<span class="text-xs font-bold">+15</span>
+<span class="text-[10px] opacity-90 leading-tight">For raising a complaint</span>
+</div>
+<div class="bg-white/10 rounded-xl p-3 flex flex-col items-center justify-center backdrop-blur-sm border border-white/10">
+<span class="text-xs font-bold">+1</span>
+<span class="text-[10px] opacity-90 leading-tight">For each upvote</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Buttons Section -->
+<section class="space-y-3">
+<h4 class="text-xs font-bold text-outline-variant uppercase tracking-widest pl-2 mb-2">Activities &amp; Support</h4>
+<button class="w-full flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-[16px] shadow-sm border border-gray-100 dark:border-gray-700 active:scale-[0.98] transition-all group">
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center text-violet-600 dark:text-violet-400 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="Assignment">assignment</span>
+</div>
+<span class="font-semibold text-on-surface">My Complaints</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-[16px] shadow-sm border border-gray-100 dark:border-gray-700 active:scale-[0.98] transition-all group">
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center text-violet-600 dark:text-violet-400 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<span class="font-semibold text-on-surface">Contact Us</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-[16px] shadow-sm border border-gray-100 dark:border-gray-700 active:scale-[0.98] transition-all group">
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 rounded-xl bg-error-container/30 flex items-center justify-center text-error group-hover:bg-error group-hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+</div>
+<span class="font-semibold text-error">Log Out</span>
+</div>
+</button>
+</section>
+<!-- Aesthetic Footer Text -->
+<p class="text-center text-[10px] text-outline-variant font-medium pt-4">
+            CampusVoice v2.4.0 © 2024 University Portal
+        </p>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full h-16 bg-white dark:bg-gray-900 flex justify-around items-center px-4 pb-safe border-t border-gray-100 dark:border-gray-800 shadow-[0_-1px_3px_0_rgba(0,0,0,0.05)] rounded-t-lg z-50">
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 font-inter text-[10px] font-medium active:scale-95 transition-transform duration-150 hover:text-violet-500 dark:hover:text-violet-300" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span>Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 font-inter text-[10px] font-medium active:scale-95 transition-transform duration-150 hover:text-violet-500 dark:hover:text-violet-300" href="#">
+<span class="material-symbols-outlined" data-icon="Assignment">assignment</span>
+<span>Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 font-inter text-[10px] font-medium active:scale-95 transition-transform duration-150 hover:text-violet-500 dark:hover:text-violet-300" href="#">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span>
+<span>Points</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 rounded-xl px-3 py-1 font-inter text-[10px] font-medium active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span>Profile</span>
+</a>
+</nav>
+</body></html>

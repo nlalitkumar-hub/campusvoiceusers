@@ -194,8 +194,17 @@ const ComplaintDetail: React.FC = () => {
 
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-6">
         {/* Image */}
-        {complaint.imageUrl && (
-          <img src={complaint.imageUrl} alt={complaint.title} className="w-full rounded-2xl object-cover max-h-80 shadow-card" />
+        {(complaint.imageUrl || complaint.imageData) && (
+          <img
+            src={
+              complaint.imageUrl && !complaint.imageUrl.includes('placehold.co')
+                ? complaint.imageUrl
+                : complaint.imageData || complaint.imageUrl
+            }
+            alt={complaint.title}
+            className="w-full rounded-2xl object-cover max-h-80 shadow-card"
+            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
         )}
 
         {/* Title & Status */}
@@ -289,28 +298,14 @@ const ComplaintDetail: React.FC = () => {
           <SatisfactionPortal
             complaint={complaint}
             onSubmitRating={async (r, feedbackText) => {
-              try {
-                const { db } = await import('../lib/firebase');
-                const { doc, updateDoc } = await import('firebase/firestore');
-                await updateDoc(doc(db, 'complaints', complaint.id), {
-                  satisfactionRating: r,
-                  satisfactionFeedback: feedbackText,
-                  ratedAt: new Date().toISOString(),
-                });
-                try {
-                  await rateComplaintAPI(complaint.id, r);
-                } catch { /* backend optional */ }
-                await updateUserPoints(user!.id, POINT_VALUES.RATE_RESOLUTION);
-                updateUser({ points: (user!.points || 0) + POINT_VALUES.RATE_RESOLUTION });
-                await loadComplaint();
-              } catch (error: any) {
-                throw new Error(error.message);
-              }
+              // Rating is now saved directly inside SatisfactionPortal.
+              // This callback is kept for compatibility but does nothing
+              // to avoid triggering loadComplaint() which would unmount the portal.
             }}
             onRaiseAgain={async (description) => {
               try {
                 const token = localStorage.getItem('token') || '';
-                const response = await fetch('http://localhost:5000/api/complaints/create', {
+            const response = await fetch('http://localhost:5001/api/complaints/create', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                   body: JSON.stringify({

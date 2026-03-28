@@ -14,7 +14,12 @@ import { checkOverdueComplaints } from './services/deadline.service'
 const app = express()
 
 app.use(cors({
-  origin: ['http://localhost:8080', 'http://localhost:8081', 'http://localhost:8083', 'http://127.0.0.1:8080', 'http://127.0.0.1:8081', 'http://127.0.0.1:8083', 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'],
+  origin: [
+    'http://localhost:8080', 'http://localhost:8081', 'http://localhost:8083',
+    'http://127.0.0.1:8080', 'http://127.0.0.1:8081', 'http://127.0.0.1:8083',
+    'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000',
+    'http://192.168.1.14:8080', 'http://192.168.1.14:8081', 'http://192.168.1.14:5173',
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -45,7 +50,7 @@ const HOUR = 60 * 60 * 1000
 setInterval(async () => { console.log('Running deadline check...'); await checkOverdueComplaints() }, HOUR)
 setTimeout(async () => { await checkOverdueComplaints() }, 5000)
 
-app.listen(Number(config.PORT), () => {
+app.listen(Number(config.PORT), '0.0.0.0', () => {
   console.log(`CampusVoice API running on port ${config.PORT}`)
   console.log(`Environment: ${config.NODE_ENV}`)
   console.log(`Frontend URL: ${config.FRONTEND_URL}`)

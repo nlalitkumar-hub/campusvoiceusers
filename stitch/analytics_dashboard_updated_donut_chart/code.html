@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed-dim": "#ddb7ff",
+              "tertiary": "#7d3d00",
+              "outline-variant": "#ccc3d8",
+              "inverse-on-surface": "#f0f1f2",
+              "outline": "#7b7487",
+              "on-tertiary-container": "#ffe0cd",
+              "inverse-primary": "#d2bbff",
+              "surface-tint": "#732ee4",
+              "surface-bright": "#f8f9fa",
+              "on-primary-container": "#ede0ff",
+              "primary-fixed": "#eaddff",
+              "on-primary-fixed-variant": "#5a00c6",
+              "on-error-container": "#93000a",
+              "on-surface-variant": "#4a4455",
+              "on-secondary-fixed": "#2c0051",
+              "on-error": "#ffffff",
+              "surface-container-low": "#f3f4f5",
+              "secondary": "#8127cf",
+              "tertiary-fixed": "#ffdcc6",
+              "tertiary-fixed-dim": "#ffb784",
+              "secondary-fixed": "#f0dbff",
+              "primary-fixed-dim": "#d2bbff",
+              "tertiary-container": "#a15100",
+              "inverse-surface": "#2e3132",
+              "on-primary-fixed": "#25005a",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed-variant": "#6900b3",
+              "on-primary": "#ffffff",
+              "surface": "#f8f9fa",
+              "on-tertiary": "#ffffff",
+              "on-secondary": "#ffffff",
+              "surface-container-highest": "#e1e3e4",
+              "primary-container": "#7c3aed",
+              "primary": "#630ed4",
+              "error": "#ba1a1a",
+              "on-tertiary-fixed-variant": "#713700",
+              "background": "#f8f9fa",
+              "surface-dim": "#d9dadb",
+              "secondary-container": "#9c48ea",
+              "on-tertiary-fixed": "#301400",
+              "on-surface": "#191c1d",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-container": "#fffbff",
+              "on-background": "#191c1d",
+              "surface-container": "#edeeef",
+              "surface-variant": "#e1e3e4",
+              "surface-container-high": "#e7e8e9"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-line { border: none !important; }
+        .tonal-transition { transition: background-color 0.3s ease; }
+        .tonal-stacking { z-index: 50; }
+        .headline-sm { font-size: 1.5rem; line-height: 2rem; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-[0_12px_24px_rgba(99,14,212,0.05)] flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-violet-700 dark:text-violet-400 active:scale-95 duration-200 cursor-pointer" style="">menu</span>
+<h1 class="text-2xl font-black text-violet-800 dark:text-violet-300 italic font-inter tracking-tight" style="">Analytics</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors p-2 rounded-full cursor-pointer" style="">notifications</span>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-5xl mx-auto">
+<!-- Editorial Header Section -->
+<section class="mb-10">
+<h2 class="text-display-sm font-headline font-extrabold tracking-tight text-on-surface mb-2 text-[2.25rem]" style="">Insights &amp; Metrics</h2>
+<p class="text-on-surface-variant body-md leading-relaxed max-w-md" style="">Detailed breakdown of campus feedback performance and personal advocacy impact.</p>
+</section>
+<!-- Mode Toggle -->
+<div class="flex p-1.5 bg-surface-container-low rounded-2xl w-full max-w-sm mb-10 shadow-sm">
+<button class="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm" style="">
+                Personal
+            </button>
+<button class="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all text-on-surface-variant hover:text-on-surface" style="">
+                Campus
+            </button>
+</div>
+<!-- Campus Analysis View (The Focus) -->
+<div class="space-y-10">
+<!-- KPI Cards Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow group">
+<p class="text-label-md font-medium text-on-surface-variant uppercase tracking-widest mb-2" style="">Total Raised</p>
+<h3 class="text-4xl font-black text-primary" style="">1,248</h3>
+<div class="mt-4 flex items-center text-xs text-emerald-600 font-bold" style="">
+<span class="material-symbols-outlined text-sm mr-1" style="">trending_up</span>
+                        +12% vs last month
+                    </div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow">
+<p class="text-label-md font-medium text-on-surface-variant uppercase tracking-widest mb-2" style="">Resolved</p>
+<h3 class="text-4xl font-black text-secondary" style="">942</h3>
+<div class="mt-4 flex items-center text-xs text-on-surface-variant font-medium" style="">
+<span class="material-symbols-outlined text-sm mr-1" style="">check_circle</span>
+                        On track
+                    </div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow">
+<p class="text-label-md font-medium text-on-surface-variant uppercase tracking-widest mb-2" style="">In Progress</p>
+<h3 class="text-4xl font-black text-primary-container" style="">156</h3>
+<div class="mt-4 flex items-center text-xs text-on-surface-variant font-medium" style="">
+<span class="material-symbols-outlined text-sm mr-1" style="">pending</span>
+                        Active now
+                    </div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow">
+<p class="text-label-md font-medium text-on-surface-variant uppercase tracking-widest mb-2" style="">Pending</p>
+<h3 class="text-4xl font-black text-outline" style="">150</h3>
+<div class="mt-4 flex items-center text-xs text-error font-bold" style="">
+<span class="material-symbols-outlined text-sm mr-1" style="">warning</span>
+                        Requires Attention
+                    </div>
+</div>
+</div>
+<!-- Bento Grid Section -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Resolution Rate Card (Large) -->
+<div class="md:col-span-4 bg-primary text-on-primary p-8 rounded-[2.5rem] flex flex-col justify-between overflow-hidden relative shadow-[0_20px_40px_rgba(99,14,212,0.15)]">
+<div class="z-10">
+<p class="text-label-md font-medium uppercase tracking-widest opacity-80 mb-1" style="">Resolution Rate</p>
+<h4 class="text-7xl font-black mb-4 tracking-tighter" style="">85%</h4>
+<div class="space-y-3">
+<p class="text-sm opacity-90 leading-relaxed font-light" style="">Campus efficiency is at an all-time high this semester.</p>
+<!-- Custom Status Veil Progress -->
+<div class="h-2 w-full bg-primary-container/40 rounded-full overflow-hidden">
+<div class="h-full w-[85%] bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.8)]"></div>
+</div>
+</div>
+</div>
+<!-- Abstract Background Shape -->
+<div class="absolute -bottom-10 -right-10 w-48 h-48 bg-primary-container/30 rounded-full blur-3xl"></div>
+</div>
+<!-- Weekly Complaints Chart (Medium) -->
+<div class="md:col-span-8 bg-surface-container-lowest p-8 rounded-[2.5rem] shadow-sm">
+<div class="flex justify-between items-center mb-10">
+<div>
+<h4 class="text-title-md font-bold text-on-surface" style="">Weekly Performance</h4>
+<p class="text-xs text-on-surface-variant" style="">Submitted vs Resolved Trends</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant" style="">Raised</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary-fixed-dim"></div>
+<span class="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant" style="">Resolved</span>
+</div>
+</div>
+</div>
+<!-- Visual Chart Placeholder (Asymmetric Lines) -->
+<div class="relative h-48 w-full flex items-end justify-between px-2">
+<svg class="absolute inset-0 w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 400 100">
+<!-- Submitted Line -->
+<path d="M0,80 Q50,40 100,70 T200,30 T300,50 T400,20" fill="none" stroke="#630ED4" stroke-linecap="round" stroke-width="4"></path>
+<!-- Resolved Line -->
+<path d="M0,90 Q50,60 100,85 T200,50 T300,70 T400,40" fill="none" stroke="#DDB7FF" stroke-dasharray="8 4" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+<!-- Labels -->
+<div class="w-full flex justify-between pt-4 mt-auto border-t border-outline-variant/10">
+<span class="text-[10px] text-on-surface-variant font-medium" style="">MON</span>
+<span class="text-[10px] text-on-surface-variant font-medium" style="">TUE</span>
+<span class="text-[10px] text-on-surface-variant font-medium" style="">WED</span>
+<span class="text-[10px] text-on-surface-variant font-medium" style="">THU</span>
+<span class="text-[10px] text-on-surface-variant font-medium" style="">FRI</span>
+<span class="text-[10px] text-on-surface-variant font-medium" style="">SAT</span>
+<span class="text-[10px] text-on-surface-variant font-medium" style="">SUN</span>
+</div>
+</div>
+</div>
+<!-- Category Distribution (Donut) -->
+<div class="md:col-span-6 bg-surface-container-lowest p-8 rounded-[2.5rem] shadow-sm flex flex-col">
+<h4 class="text-title-md font-bold text-on-surface mb-8" style="">Category Mix</h4>
+<div class="flex items-center gap-10 flex-1">
+<div class="relative w-40 h-40">
+<!-- Conic Gradient Donut Chart -->
+<div class="absolute inset-0 rounded-full shadow-inner" style="background: conic-gradient(#630ed4 0% 42%, #8127cf 42% 70%, #d2bbff 70% 85%, #ccc3d8 85% 100%);"></div>
+<!-- Hollow Center -->
+<div class="absolute inset-[20%] bg-white rounded-full flex flex-col items-center justify-center shadow-sm z-10">
+<span class="text-2xl font-black text-on-surface">6</span>
+<span class="text-[9px] uppercase font-bold tracking-widest text-on-surface-variant">Sectors</span>
+</div>
+</div>
+<div class="space-y-4 flex-1">
+<div class="flex justify-between items-center py-1 border-b border-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-sm bg-[#630ed4]"></div>
+<span class="text-xs font-semibold text-on-surface-variant">Infrastructure</span>
+</div>
+<span class="text-xs font-black text-on-surface">42%</span>
+</div>
+<div class="flex justify-between items-center py-1 border-b border-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-sm bg-[#8127cf]"></div>
+<span class="text-xs font-semibold text-on-surface-variant">Hygiene</span>
+</div>
+<span class="text-xs font-black text-on-surface">28%</span>
+</div>
+<div class="flex justify-between items-center py-1 border-b border-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-sm bg-[#d2bbff]"></div>
+<span class="text-xs font-semibold text-on-surface-variant">Academics</span>
+</div>
+<span class="text-xs font-black text-on-surface">15%</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-sm bg-[#ccc3d8]"></div>
+<span class="text-xs font-semibold text-on-surface-variant">Others</span>
+</div>
+<span class="text-xs font-black text-on-surface">15%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Most Reported Category (Columns) -->
+<div class="md:col-span-6 bg-surface-container-lowest p-8 rounded-[2.5rem] shadow-sm">
+<h4 class="text-title-md font-bold text-on-surface mb-8" style="">Frequency by Sector</h4>
+<div class="flex items-end justify-between h-40 gap-4 px-2">
+<div class="flex flex-col items-center gap-3 flex-1">
+<div class="w-full bg-surface-container-low rounded-t-xl relative overflow-hidden h-[80%]">
+<div class="absolute bottom-0 w-full bg-primary-container h-full rounded-t-xl"></div>
+</div>
+<span class="text-[9px] uppercase font-bold text-on-surface-variant" style="">INFRA</span>
+</div>
+<div class="flex flex-col items-center gap-3 flex-1">
+<div class="w-full bg-surface-container-low rounded-t-xl relative overflow-hidden h-[60%]">
+<div class="absolute bottom-0 w-full bg-secondary-container h-full rounded-t-xl"></div>
+</div>
+<span class="text-[9px] uppercase font-bold text-on-surface-variant" style="">HYGIENE</span>
+</div>
+<div class="flex flex-col items-center gap-3 flex-1">
+<div class="w-full bg-surface-container-low rounded-t-xl relative overflow-hidden h-[45%]">
+<div class="absolute bottom-0 w-full bg-primary h-full rounded-t-xl"></div>
+</div>
+<span class="text-[9px] uppercase font-bold text-on-surface-variant" style="">ACAD</span>
+</div>
+<div class="flex flex-col items-center gap-3 flex-1">
+<div class="w-full bg-surface-container-low rounded-t-xl relative overflow-hidden h-[30%]">
+<div class="absolute bottom-0 w-full bg-outline h-full rounded-t-xl"></div>
+</div>
+<span class="text-[9px] uppercase font-bold text-on-surface-variant" style="">HOSTEL</span>
+</div>
+<div class="flex flex-col items-center gap-3 flex-1">
+<div class="w-full bg-surface-container-low rounded-t-xl relative overflow-hidden h-[20%]">
+<div class="absolute bottom-0 w-full bg-outline-variant h-full rounded-t-xl"></div>
+</div>
+<span class="text-[9px] uppercase font-bold text-on-surface-variant" style="">ADMIN</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Insight Card -->
+<div class="bg-surface-container-high/50 p-8 rounded-[2rem] flex items-center gap-6">
+<div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-3xl" style='font-variation-settings: "FILL" 1;'>auto_awesome</span>
+</div>
+<div>
+<h5 class="text-title-md font-bold text-on-surface" style="">Smart Recommendation</h5>
+<p class="text-sm text-on-surface-variant" style="">Hygiene reports in the North Block have spiked by 25%. Suggesting immediate maintenance review for water coolers.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl shadow-[0_-8px_20px_rgba(99,14,212,0.08)] rounded-t-3xl z-50">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:text-violet-500 dark:hover:text-violet-300 transition-all active:scale-90 duration-200" href="#" style="">
+<span class="material-symbols-outlined mb-1" style="">dynamic_feed</span>
+<span class="font-inter text-[10px] font-medium uppercase tracking-widest" style="">Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-violet-100 dark:bg-violet-900/40 text-violet-800 dark:text-violet-100 rounded-2xl px-3 py-1.5 transition-all" href="#" style="">
+<span class="material-symbols-outlined mb-1" style="">analytics</span>
+<span class="font-inter text-[10px] font-medium uppercase tracking-widest" style="">Analytics</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:text-violet-500 dark:hover:text-violet-300 transition-all active:scale-90 duration-200" href="#" style="">
+<span class="material-symbols-outlined mb-1 text-3xl text-violet-600" style="">add_circle</span>
+<span class="font-inter text-[10px] font-medium uppercase tracking-widest" style="">Raise</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:text-violet-500 dark:hover:text-violet-300 transition-all active:scale-90 duration-200" href="#" style="">
+<span class="material-symbols-outlined mb-1" style="">dashboard</span>
+<span class="font-inter text-[10px] font-medium uppercase tracking-widest" style="">Board</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:text-violet-500 dark:hover:text-violet-300 transition-all active:scale-90 duration-200" href="#" style="">
+<span class="material-symbols-outlined mb-1" style="">person</span>
+<span class="font-inter text-[10px] font-medium uppercase tracking-widest" style="">Profile</span>
+</a>
+</nav>
+</body></html>

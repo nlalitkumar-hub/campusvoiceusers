@@ -41,9 +41,9 @@ export const getComplaintById = asyncHandler(async (req: Request, res: Response)
 })
 
 export const verifyComplaintHandler = asyncHandler(async (req: Request, res: Response) => {
-  const { imageBase64, description } = req.body
+  const { imageBase64, description, category } = req.body
   if (!imageBase64 || !description) throw new ApiError(400, 'Image and description required')
-  const result = await aiVerify(imageBase64, description)
+  const result = await aiVerify(imageBase64, description, category)
   return res.status(200).json(new ApiResponse(200, result, 'Verification complete'))
 })
 
@@ -61,9 +61,21 @@ export const createComplaint = asyncHandler(async (req: Request, res: Response) 
 
   let imageUrl = 'https://placehold.co/600x400?text=Complaint'
   let imagePublicId = `placeholder_${Date.now()}`
+  let imageData: string | null = null  // base64 fallback when Cloudinary fails
+
   if (imageBase64) {
     const uploaded = await uploadBase64Image(imageBase64, 'campusvoice/complaints')
-    imageUrl = uploaded.url; imagePublicId = uploaded.publicId
+    if (!uploaded.url.includes('placehold.co')) {
+      // Cloudinary succeeded
+      imageUrl = uploaded.url
+      imagePublicId = uploaded.publicId
+    } else {
+      // Cloudinary failed — store base64 directly (compressed)
+      const base64Data = imageBase64.includes(',') ? imageBase64.split(',')[1] : imageBase64
+      imageData = `data:image/jpeg;base64,${base64Data}`
+      imageUrl = imageData  // use base64 as the URL directly
+      console.log('Cloudinary unavailable — storing image as base64')
+    }
   }
 
   const deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
@@ -71,7 +83,7 @@ export const createComplaint = asyncHandler(async (req: Request, res: Response) 
   const complaintData = {
     id: complaintRef.id, title: title.trim(), description: description.trim(),
     category, location: location?.trim() || '', coordinates: coordinates || null,
-    imageUrl, imagePublicId, submittedBy: req.user.id, submittedByName: submitterName,
+    imageUrl, imagePublicId, imageData: imageData || null, submittedBy: req.user.id, submittedByName: submitterName,
     institute: req.user.institute, status: 'pending', upvotes: [], upvoteCount: 0,
     isEndorsed: false, endorsedBy: null, aiVerified: true, satisfactionRating: null,
     deadline, deadlineDays: 7, daysElapsed: 0, daysRemaining: 7, isOverdue: false,

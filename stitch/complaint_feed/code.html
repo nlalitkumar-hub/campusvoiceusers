@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CampusVoice — Complaint Feed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#ccc3d8",
+              "surface-container-high": "#e7e8e9",
+              "primary-fixed": "#eaddff",
+              "surface-variant": "#e1e3e4",
+              "surface-container-lowest": "#ffffff",
+              "on-primary": "#ffffff",
+              "surface-container": "#edeeef",
+              "primary": "#630ed4",
+              "primary-container": "#7c3aed",
+              "secondary-fixed-dim": "#ddb7ff",
+              "on-secondary-fixed": "#2c0051",
+              "on-tertiary-container": "#ffe0cd",
+              "on-secondary-fixed-variant": "#6900b3",
+              "on-background": "#191c1d",
+              "tertiary-fixed": "#ffdcc6",
+              "inverse-primary": "#d2bbff",
+              "on-tertiary-fixed": "#301400",
+              "inverse-surface": "#2e3132",
+              "tertiary-container": "#a15100",
+              "surface-tint": "#732ee4",
+              "tertiary": "#7d3d00",
+              "inverse-on-surface": "#f0f1f2",
+              "on-primary-container": "#ede0ff",
+              "secondary": "#8127cf",
+              "secondary-container": "#9c48ea",
+              "on-primary-fixed-variant": "#5a00c6",
+              "surface-container-highest": "#e1e3e4",
+              "on-secondary-container": "#fffbff",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-fixed-variant": "#713700",
+              "surface": "#f8f9fa",
+              "on-surface-variant": "#4a4455",
+              "primary-fixed-dim": "#d2bbff",
+              "error": "#ba1a1a",
+              "error-container": "#ffdad6",
+              "outline": "#7b7487",
+              "on-primary-fixed": "#25005a",
+              "surface-bright": "#f8f9fa",
+              "on-surface": "#191c1d",
+              "tertiary-fixed-dim": "#ffb784",
+              "surface-container-low": "#f3f4f5",
+              "secondary-fixed": "#f0dbff",
+              "background": "#f8f9fa",
+              "on-secondary": "#ffffff",
+              "surface-dim": "#d9dadb",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-sm h-[56px] flex justify-between items-center px-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-purple-700 dark:text-purple-400" data-icon="campaign">campaign</span>
+<h1 class="font-inter text-2xl font-bold tracking-tight text-purple-700 dark:text-purple-400 italic">CampusVoice</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-gray-500" data-icon="search">search</span>
+</button>
+<div class="relative hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-gray-500" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold ring-2 ring-primary/10">
+                JD
+            </div>
+</div>
+</header>
+<main class="pt-16 px-4 max-w-md mx-auto">
+<!-- Search Bar Section -->
+<section class="mt-4">
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-3 pl-12 pr-10 text-body-md focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="Search complaints..." type="text"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline cursor-pointer hover:text-on-surface" data-icon="close">close</span>
+</div>
+</section>
+<!-- Filter Tabs -->
+<section class="mt-6 -mx-4">
+<div class="flex gap-2 overflow-x-auto px-4 hide-scrollbar">
+<button class="px-5 py-2 rounded-full bg-primary text-on-primary text-sm font-semibold whitespace-nowrap shadow-md shadow-primary/20">All</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-lowest text-on-surface-variant text-sm font-medium whitespace-nowrap hover:bg-surface-container transition-colors">Trending 🔥</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-lowest text-on-surface-variant text-sm font-medium whitespace-nowrap hover:bg-surface-container transition-colors">In Progress</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-lowest text-on-surface-variant text-sm font-medium whitespace-nowrap hover:bg-surface-container transition-colors">Resolved</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-lowest text-on-surface-variant text-sm font-medium whitespace-nowrap hover:bg-surface-container transition-colors">My Institute</button>
+</div>
+</section>
+<!-- Feed List -->
+<div class="mt-8 space-y-6">
+<!-- Complaint Card 1 -->
+<article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-shadow duration-300">
+<div class="relative h-[200px] w-full">
+<img alt="Academic building with broken window" class="w-full h-full object-cover" data-alt="modern university lecture hall with cracked glass window panel and campus greenery visible in background soft daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJizjValEpUkrqMI4azMgGDIx7CQiPiHtZ7AgrDoi7x42l6j8_4dnRdodtodFLCT4FFGwGcrWa7PAQu4lddLBvJ_XIXQCvaDDCRXDyWbf_HCU65Te9IhrPpvwrm33Zvj5WbUwNBFtC8f0qny5L7COUdNnYy9WFCztsbHNLPHDdqh9U6mWTwMR5GiqB98OfhH-pm4qvLKEKDchTqJPJApsRhhOJQ7BfV_8HGnhOt09zW99p4EsL9AUnrSyQhLvM2t-Glv5BjthzILMV"/>
+<div class="absolute top-3 left-3 flex gap-2">
+<span class="bg-amber-400 text-on-background px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span> Priority
+                        </span>
+</div>
+<div class="absolute top-3 right-3">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">Pending</span>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant text-[10px] font-bold border border-outline-variant/10">FACILITIES</span>
+<span class="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-100">
+<span class="material-symbols-outlined text-[12px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span> AI VERIFIED
+                        </span>
+</div>
+<h2 class="text-[15px] font-bold text-on-surface leading-snug line-clamp-2">Broken ventilation system in Main Auditorium causing extreme heat during lectures</h2>
+<div class="mt-2 flex items-center gap-1 text-outline text-[12px]">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+<span>Science Block, Floor 2</span>
+</div>
+<div class="mt-4 flex items-center justify-between border-t border-surface-container pt-3">
+<span class="text-[11px] text-outline font-medium">2h ago</span>
+<button class="flex items-center gap-1.5 bg-primary text-on-primary px-4 py-1.5 rounded-full text-xs font-bold transition-transform active:scale-95 shadow-md shadow-primary/20">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_upward">arrow_upward</span>
+<span>124</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Complaint Card 2 -->
+<article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-shadow duration-300">
+<div class="relative h-[200px] w-full">
+<img alt="Overflowing trash bin in student plaza" class="w-full h-full object-cover" data-alt="overflowing recycling bin at a busy university plaza with blurred students walking in background golden hour lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQGb_k9G4tiXe94lh7lRYeCNCSUkvXDyF8eegttcnM_Q9FRf-NvdPeX2XqdSFxR5QY6fu8rPhAK5HKe0iLBxaINbCZg9mrw7G-3kFX7OwHzVRv-qak4Kv-TpgeUn6GavD7jRBD-8NJSU0EXbSFEi2BI6tMTwE6xlHDSA99Cmkot5meOkg2gEQGgq0ddqcwO9WNWTUhA50bGKljMw6kpq7bZn9oxsqrnjxUGFbj815B1Cq_XiihQFTET2esV_IYytYRkQfdIz3lJbE6"/>
+<div class="absolute top-3 right-3">
+<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">In Progress</span>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant text-[10px] font-bold border border-outline-variant/10">HYGIENE</span>
+</div>
+<h2 class="text-[15px] font-bold text-on-surface leading-snug line-clamp-2">Sanitation issues in West Wing Cafeteria — waste disposal frequency needs increase</h2>
+<div class="mt-2 flex items-center gap-1 text-outline text-[12px]">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+<span>Student Hub Plaza</span>
+</div>
+<div class="mt-4 flex items-center justify-between border-t border-surface-container pt-3">
+<span class="text-[11px] text-outline font-medium">5h ago</span>
+<button class="flex items-center gap-1.5 border border-outline-variant text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-bold hover:bg-surface-container transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_upward">arrow_upward</span>
+<span>42</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="fixed bottom-[80px] left-1/2 -translate-x-1/2 z-50">
+<button class="w-[58px] h-[58px] bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30 active:scale-90 transition-transform relative">
+<span class="material-symbols-outlined text-[32px]" data-icon="add">add</span>
+<span class="absolute inset-0 rounded-full animate-ping bg-primary/20 -z-10"></span>
+</button>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full h-[60px] bg-white dark:bg-gray-900 z-40 flex justify-around items-center px-4 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center text-purple-600 dark:text-purple-400 font-bold tap-highlight-transparent" href="#">
+<span class="material-symbols-outlined" data-icon="dynamic_feed">dynamic_feed</span>
+<span class="font-inter text-[10px] font-medium uppercase tracking-widest mt-1">Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-purple-500 transition-colors tap-highlight-transparent" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-inter text-[10px] font-medium uppercase tracking-widest mt-1">Analytics</span>
+</a>
+<div class="w-12"></div> <!-- FAB Spacer -->
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-purple-500 transition-colors tap-highlight-transparent" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-inter text-[10px] font-medium uppercase tracking-widest mt-1">Board</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-purple-500 transition-colors tap-highlight-transparent" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-inter text-[10px] font-medium uppercase tracking-widest mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

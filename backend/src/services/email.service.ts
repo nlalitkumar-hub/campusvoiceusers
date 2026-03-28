@@ -2,10 +2,16 @@ import nodemailer from 'nodemailer'
 import { config } from '../config/env'
 
 export const sendOTPEmail = async (email: string, otp: string, name: string): Promise<void> => {
+  // Skip silently if SMTP is not configured
+  if (!config.EMAIL_HOST || !config.EMAIL_USER || !config.EMAIL_PASS) {
+    console.log(`[Email skipped — SMTP not configured] OTP for ${email}: ${otp}`)
+    return
+  }
   try {
     const transporter = nodemailer.createTransport({
       host: config.EMAIL_HOST, port: config.EMAIL_PORT, secure: false,
-      auth: { user: config.EMAIL_USER, pass: config.EMAIL_PASS }
+      auth: { user: config.EMAIL_USER, pass: config.EMAIL_PASS },
+      connectionTimeout: 5000, greetingTimeout: 5000, socketTimeout: 5000,
     })
     await transporter.sendMail({
       from: `"CampusVoice" <${config.EMAIL_USER}>`,

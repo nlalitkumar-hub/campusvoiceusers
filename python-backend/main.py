@@ -42,6 +42,7 @@ async def root():
             "GET /health",
             "POST /api/verify-image",
             "POST /api/verify-campus",
+            "POST /api/verify-resolution",
         ],
     }
 

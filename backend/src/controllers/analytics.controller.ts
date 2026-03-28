@@ -42,3 +42,64 @@ export const getSummary = asyncHandler(async (req: Request, res: Response) => {
     departmentPerformance
   }, 'Analytics fetched'))
 })
+
+export const getPersonalAnalytics = asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const userEmail = (req as any).user?.email
+
+    const snapshot = await db.collection('complaints').where('submittedBy', '==', userEmail).get()
+    const complaints = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any))
+
+    const totalRaised = complaints.length
+    const resolved = complaints.filter(c => c.status === 'resolved').length
+    const inProgress = complaints.filter(c =>
+      c.status === 'in_progress' || c.status === 'in-progress' || c.status === 'In Progress'
+    ).length
+    const pending = complaints.filter(c =>
+      c.status === 'pending' || c.status === 'Pending'
+    ).length
+    const rejected = complaints.filter(c =>
+      c.status === 'rejected' || c.status === 'Rejected'
+    ).length
+
+    const categoryMap: Record<string, number> = {}
+    complaints.forEach(c => {
+      const cat = c.category || 'Other'
+      categoryMap[cat] = (categoryMap[cat] || 0) + 1
+    })
+    const categoryBreakdown = Object.entries(categoryMap)
+      .map(([category, count]) => ({ category, count }))
+      .sort((a, b) => b.count - a.count)
+
+    const statusDistribution = [
+      { status: 'Pending', count: pending, color: '#F59E0B' },
+      { status: 'In Progress', count: inProgress, color: '#3B82F6' },
+      { status: 'Resolved', count: resolved, color: '#10B981' },
+      { status: 'Rejected', count: rejected, color: '#EF4444' },
+    ]
+
+    const resolutionRate = totalRaised > 0 ? Math.round((resolved / totalRaised) * 100) : 0
+
+    const monthlyTrend = []
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date()
+      date.setMonth(date.getMonth() - i)
+      const monthName = date.toLocaleString('default', { month: 'short' })
+      const year = date.getFullYear()
+      const month = date.getMonth()
+      const count = complaints.filter(c => {
+        const createdAt = c.createdAt?.toDate ? c.createdAt.toDate() : new Date(c.createdAt)
+        return createdAt.getMonth() === month && createdAt.getFullYear() === year
+      }).length
+      monthlyTrend.push({ month: monthName, count })
+    }
+
+    return res.status(200).json(new ApiResponse(200, {
+      totalRaised, resolved, inProgress, pending, rejected,
+      resolutionRate, categoryBreakdown, statusDistribution, monthlyTrend
+    }, 'Personal analytics fetched'))
+  } catch (error) {
+    console.error('Personal analytics error:', error)
+    return res.status(500).json({ success: false, message: 'Failed to fetch personal analytics' })
+  }
+})

@@ -18,10 +18,10 @@ export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
     attempts: 0, createdAt: new Date().toISOString()
   })
   console.log(`✅ OTP saved for ${email}: ${otpToStore}`)
-  try { await sendOTPEmail(email, otpToStore, name) } catch (e: any) { console.error('Email failed:', e.message) }
+  console.log(`OTP for testing: ${otpToStore}`)
+  try { await sendOTPEmail(email, otpToStore, name) } catch (e: any) { console.error('Email failed (non-fatal):', e.message) }
 
-  // TEMPORARY: devOTP returned for testing — remove before going live
-  return res.status(200).json(new ApiResponse(200, { message: `OTP sent to ${email}`, devOTP: plainOTP }, 'OTP sent successfully'))
+  return res.status(200).json(new ApiResponse(200, { message: `OTP sent to ${email}` }, 'OTP sent successfully'))
 })
 
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {

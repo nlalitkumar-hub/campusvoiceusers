@@ -5,7 +5,21 @@ from typing import Optional, List
 class VerifyRequest(BaseModel):
     imageBase64: str
     description: str
+    category: Optional[str] = "Infrastructure"
     location: Optional[str] = None
+
+
+class FinalVerifyRequest(BaseModel):
+    before_url: str   # Cloudinary URL of student's original complaint photo
+    after_url: str    # Cloudinary URL of authority's resolution photo
+    complaint_id: Optional[str] = None
+
+
+class FinalVerifyResponse(BaseModel):
+    status: str       # "MATCHED", "NOT_MATCHED", "UNCERTAIN"
+    score: float
+    action: Optional[str] = None   # "trigger_claude" when uncertain
+    message: str
 
 
 class DetectedObject(BaseModel):
@@ -39,3 +53,9 @@ class VerifyResponse(BaseModel):
     clipResults: dict
     reason: str
     score: float
+    # Triage fields
+    status: Optional[str] = None
+    detected_objects: Optional[List[str]] = None
+    confidence: Optional[float] = None
+    verification_image_url: Optional[str] = None
+    specialist_model: Optional[str] = None

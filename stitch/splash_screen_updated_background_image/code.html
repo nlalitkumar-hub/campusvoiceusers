@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CampusVoice — Welcome</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#ccc3d8",
+              "surface-container-high": "#e7e8e9",
+              "primary-fixed": "#eaddff",
+              "surface-variant": "#e1e3e4",
+              "surface-container-lowest": "#ffffff",
+              "on-primary": "#ffffff",
+              "surface-container": "#edeeef",
+              "primary": "#7C3AED",
+              "primary-container": "#7c3aed",
+              "secondary-fixed-dim": "#ddb7ff",
+              "on-secondary-fixed": "#2c0051",
+              "on-tertiary-container": "#ffe0cd",
+              "on-secondary-fixed-variant": "#6900b3",
+              "on-background": "#191c1d",
+              "tertiary-fixed": "#ffdcc6",
+              "inverse-primary": "#d2bbff",
+              "on-tertiary-fixed": "#301400",
+              "inverse-surface": "#2e3132",
+              "tertiary-container": "#a15100",
+              "surface-tint": "#732ee4",
+              "tertiary": "#7d3d00",
+              "inverse-on-surface": "#f0f1f2",
+              "on-primary-container": "#ede0ff",
+              "secondary": "#8127cf",
+              "secondary-container": "#9c48ea",
+              "on-primary-fixed-variant": "#5a00c6",
+              "surface-container-highest": "#e1e3e4",
+              "on-secondary-container": "#fffbff",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-fixed-variant": "#713700",
+              "surface": "#f8f9fa",
+              "on-surface-variant": "#4a4455",
+              "primary-fixed-dim": "#d2bbff",
+              "error": "#ba1a1a",
+              "error-container": "#ffdad6",
+              "outline": "#7b7487",
+              "on-primary-fixed": "#25005a",
+              "surface-bright": "#f8f9fa",
+              "on-surface": "#191c1d",
+              "tertiary-fixed-dim": "#ffb784",
+              "surface-container-low": "#f3f4f5",
+              "secondary-fixed": "#f0dbff",
+              "background": "#f8f9fa",
+              "on-secondary": "#ffffff",
+              "surface-dim": "#d9dadb",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+        }
+        .tonal-elevation {
+            background: #ffffff;
+            transition: all 0.2s ease-in-out;
+        }
+        .tonal-elevation:hover {
+            background: #f3f4f5;
+        }
+        .hero-curve {
+            clip-path: ellipse(110% 100% at 50% 0%);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-0 m-0 overflow-hidden bg-gray-100">
+<!-- Mobile Screen Wrapper (390px mandate) -->
+<main class="w-[390px] h-[844px] bg-white flex flex-col relative overflow-hidden shadow-2xl">
+<!-- Top Half: Hero Image with Curve -->
+<section class="relative h-[42%] w-full overflow-hidden">
+<div class="absolute inset-0 bg-[#E0E7FF] hero-curve">
+<img alt="University Illustration" class="w-full h-full object-cover object-bottom opacity-90" src="https://lh3.googleusercontent.com/aida/ADBb0uiidieyjkZmBztn1qNwPsmJAqEUEweJuxARHwOT_0PwyrFQq9ZSs-iar36AqEZIx1PyklrJUPC2ryPsPBcoesp2oDJZYaGLHKHihNMpW9Nozp3iiMDd0-XRmsXa-zLLSjCzgxWkfMaWkcZd7fVNeLW72kXTe3GvgKb09YseTpZnTuTiiI2z6pKVW28qnFYjh-JrmrIJygaAQTiRj1fmKCGeGY64GjSKOlzeudUFw7YcvFKzf_30NNSXR6OztmhvbPvIJylrf7rE-2I"/>
+</div>
+</section>
+<!-- Middle Section: Heading and Tagline -->
+<section class="flex flex-col items-center pt-8 pb-6 px-6 text-center">
+<h1 class="text-[32px] font-extrabold text-[#7C3AED] tracking-tight leading-none mb-2">
+                CampusVoice
+            </h1>
+<p class="text-on-surface-variant text-[14px] font-medium tracking-wide opacity-70">
+                Your Voice. Your Campus. Resolved.
+            </p>
+</section>
+<!-- Bottom Section: Role Selection Cards -->
+<section class="flex-1 flex flex-col px-4 space-y-4">
+<span class="text-on-surface-variant text-[11px] font-bold uppercase tracking-[0.15em] text-center mb-1">
+                Select your role to continue
+            </span>
+<!-- Role Card: Student -->
+<div class="h-[100px] w-full border-[1.2px] border-[#E5E7EB] rounded-2xl p-4 flex items-center justify-between tonal-elevation cursor-pointer active:scale-[0.98]">
+<div class="flex items-center space-x-4">
+<div class="w-14 h-14 bg-[#F3E8FF] flex items-center justify-center rounded-full text-2xl">
+                        🎓
+                    </div>
+<div>
+<h2 class="text-[17px] font-bold text-on-surface leading-tight">Student</h2>
+<p class="text-[13px] text-on-surface-variant">Raise and track campus complaints</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline/40" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Role Card: Faculty -->
+<div class="h-[100px] w-full border-[1.2px] border-[#E5E7EB] rounded-2xl p-4 flex items-center justify-between tonal-elevation cursor-pointer active:scale-[0.98]">
+<div class="flex items-center space-x-4">
+<div class="w-14 h-14 bg-[#DBEAFE] flex items-center justify-center rounded-full text-2xl">
+                        👨‍🏫
+                    </div>
+<div>
+<h2 class="text-[17px] font-bold text-on-surface leading-tight">Faculty</h2>
+<p class="text-[13px] text-on-surface-variant">Endorse and monitor complaints</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline/40" data-icon="chevron_right">chevron_right</span>
+</div>
+</section>
+<!-- Footer Section -->
+<section class="px-4 pb-10 flex flex-col space-y-4">
+<button class="w-full h-[56px] bg-primary-container text-white text-[16px] font-bold rounded-2xl shadow-[0_8px_20px_rgba(124,58,237,0.25)] flex items-center justify-center active:scale-[0.97] transition-all">
+                Continue
+            </button>
+<div class="text-center">
+<span class="text-[10px] text-outline/60 font-medium tracking-widest uppercase">
+                    CampusVoice v1.0
+                </span>
+</div>
+</section>
+</main>
+</body></html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign Up | CampusVoice</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary": "#7d3d00",
+              "surface-container-lowest": "#ffffff",
+              "on-surface": "#191c1d",
+              "surface-tint": "#732ee4",
+              "on-primary": "#ffffff",
+              "primary-fixed": "#eaddff",
+              "on-secondary-container": "#fffbff",
+              "on-background": "#191c1d",
+              "outline": "#7b7487",
+              "surface": "#f8f9fa",
+              "primary": "#630ed4",
+              "surface-dim": "#d9dadb",
+              "tertiary-fixed-dim": "#ffb784",
+              "secondary-fixed": "#f0dbff",
+              "on-tertiary-fixed-variant": "#713700",
+              "on-primary-fixed-variant": "#5a00c6",
+              "on-primary-container": "#ede0ff",
+              "on-primary-fixed": "#25005a",
+              "outline-variant": "#ccc3d8",
+              "on-secondary-fixed": "#2c0051",
+              "inverse-on-surface": "#f0f1f2",
+              "surface-container": "#edeeef",
+              "on-tertiary": "#ffffff",
+              "on-surface-variant": "#4a4455",
+              "inverse-primary": "#d2bbff",
+              "surface-container-low": "#f3f4f5",
+              "tertiary-fixed": "#ffdcc6",
+              "inverse-surface": "#2e3132",
+              "tertiary-container": "#a15100",
+              "secondary-container": "#9c48ea",
+              "secondary": "#8127cf",
+              "on-error": "#ffffff",
+              "surface-variant": "#e1e3e4",
+              "surface-bright": "#f8f9fa",
+              "background": "#f8f9fa",
+              "on-secondary-fixed-variant": "#6900b3",
+              "error-container": "#ffdad6",
+              "primary-fixed-dim": "#d2bbff",
+              "surface-container-highest": "#e1e3e4",
+              "on-error-container": "#93000a",
+              "surface-container-high": "#e7e8e9",
+              "on-tertiary-container": "#ffe0cd",
+              "on-tertiary-fixed": "#301400",
+              "secondary-fixed-dim": "#ddb7ff",
+              "primary-container": "#7c3aed",
+              "error": "#ba1a1a",
+              "on-secondary": "#ffffff"
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "headline": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden">
+<!-- Full Screen Background Image -->
+<div class="fixed inset-0 z-0">
+<img alt="University building" class="w-full h-full object-cover" data-alt="Modern university campus building with an entrance gate and a signpost for VIT University Chennai Campus under a clear blue sky" src="https://lh3.googleusercontent.com/aida/ADBb0uiidieyjkZmBztn1qNwPsmJAqEUEweJuxARHwOT_0PwyrFQq9ZSs-iar36AqEZIx1PyklrJUPC2ryPsPBcoesp2oDJZYaGLHKHihNMpW9Nozp3iiMDd0-XRmsXa-zLLSjCzgxWkfMaWkcZd7fVNeLW72kXTe3GvgKb09YseTpZnTuTiiI2z6pKVW28qnFYjh-JrmrIJygaAQTiRj1fmKCGeGY64GjSKOlzeudUFw7YcvFKzf_30NNSXR6OztmhvbPvIJylrf7rE-2I"/>
+<!-- Overlay to ensure text readability and brand tone -->
+<div class="absolute inset-0 bg-primary/20 mix-blend-multiply"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40"></div>
+</div>
+<!-- Main Content Canvas -->
+<main class="relative z-10 min-h-screen flex items-center justify-center p-6">
+<!-- Sign Up Card -->
+<div class="glass-card w-full max-w-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/30 p-8 flex flex-col items-center">
+<!-- Brand Identity -->
+<div class="mb-8 flex flex-col items-center space-y-2">
+<div class="w-12 h-12 bg-primary-container rounded-xl flex items-center justify-center text-on-primary-container shadow-lg">
+<span class="material-symbols-outlined text-2xl" data-icon="account_balance">account_balance</span>
+</div>
+<h1 class="text-3xl font-bold tracking-tight text-on-surface font-headline pt-4">Join CampusVoice</h1>
+<p class="text-on-surface-variant text-sm text-center px-4">Empowering students to share their scholarly perspective and advocate for change.</p>
+</div>
+<!-- Form Container -->
+<form class="w-full space-y-5">
+<!-- Full Name -->
+<div class="space-y-1.5">
+<label class="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Full Name</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="person">person</span>
+</div>
+<input class="w-full bg-surface-container-highest/50 border-none rounded-xl py-3.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all placeholder:text-on-surface-variant/40" placeholder="Alexander Sterling" type="text"/>
+</div>
+</div>
+<!-- College ID -->
+<div class="space-y-1.5">
+<label class="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">College ID</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="id_card">id_card</span>
+</div>
+<input class="w-full bg-surface-container-highest/50 border-none rounded-xl py-3.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all placeholder:text-on-surface-variant/40" placeholder="STU-2024-8891" type="text"/>
+</div>
+</div>
+<!-- Institute -->
+<div class="space-y-1.5">
+<label class="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Institute</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="apartment">apartment</span>
+</div>
+<input class="w-full bg-surface-container-highest/50 border-none rounded-xl py-3.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all placeholder:text-on-surface-variant/40" placeholder="Faculty of Social Sciences" type="text"/>
+</div>
+</div>
+<!-- Email -->
+<div class="space-y-1.5">
+<label class="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Email Address</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="mail">mail</span>
+</div>
+<input class="w-full bg-surface-container-highest/50 border-none rounded-xl py-3.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all placeholder:text-on-surface-variant/40" placeholder="alex@university.edu" type="email"/>
+</div>
+</div>
+<!-- Create Account Button -->
+<div class="pt-4">
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold py-4 rounded-xl shadow-[0_12px_24px_rgba(99,14,212,0.25)] active:scale-95 transition-all duration-200" type="submit">
+                        Create Account
+                    </button>
+</div>
+</form>
+<!-- Login Redirect -->
+<div class="mt-8 text-sm">
+<p class="text-on-surface-variant">
+                    Already have an account? 
+                    <a class="text-primary font-bold ml-1 hover:underline underline-offset-4" href="#">Login</a>
+</p>
+</div>
+<!-- Footer Compliance -->
+<div class="mt-10 flex flex-wrap justify-center gap-4">
+<span class="text-[10px] text-on-surface-variant/60 font-medium tracking-tight">Terms of Service</span>
+<span class="text-[10px] text-on-surface-variant/60 font-medium tracking-tight">Privacy Policy</span>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Shell Suppression (Transactional Page) -->
+<!-- As per instructions: Suppress navigation shell for transactional screens like Sign-up -->
+</body></html>

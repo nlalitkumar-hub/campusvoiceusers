@@ -1,62 +1,56 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, GraduationCap, Briefcase, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, Mail, User, CreditCard, Building2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-const API = 'http://localhost:5000/api';
+const API = 'http://localhost:5001/api';
+
+const isNetworkError = (err: any) =>
+  err instanceof TypeError && (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Failed'));
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const role = (localStorage.getItem('campusvoice_role') || 'student') as 'student' | 'faculty';
 
-  // Form fields
   const [name, setName] = useState('');
   const [collegeId, setCollegeId] = useState('');
   const [institute, setInstitute] = useState('');
   const [email, setEmail] = useState('');
-
-  // OTP
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [step, setStep] = useState<'form' | 'otp'>('form');
   const [isDirectLogin, setIsDirectLogin] = useState(false);
-
-  // Direct login
   const [showDirectLogin, setShowDirectLogin] = useState(false);
   const [directLoginEmail, setDirectLoginEmail] = useState('');
   const [directLoginError, setDirectLoginError] = useState('');
   const [directLoginLoading, setDirectLoginLoading] = useState(false);
-
-  // Email check
   const [emailCheckLoading, setEmailCheckLoading] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
   const [emailCheckDone, setEmailCheckDone] = useState(false);
-
-  // General
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  // TEMPORARY: OTP display for testing — remove before going live
-  const [generatedOTP, setGeneratedOTP] = useState('');
+  const [resendCountdown, setResendCountdown] = useState(0);
 
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const emailRef = useRef<HTMLInputElement>(null);
-  const directLoginRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (step === 'otp') {
       setOtp(['', '', '', '', '', '']);
+      setResendCountdown(30);
       setTimeout(() => otpRefs.current[0]?.focus(), 200);
     }
   }, [step]);
 
-  // Email duplicate detection
+  useEffect(() => {
+    if (resendCountdown <= 0) return;
+    const t = setTimeout(() => setResendCountdown(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCountdown]);
+
   useEffect(() => {
     if (!email || !email.includes('@') || !email.includes('.')) {
-      setEmailExists(false);
-      setEmailCheckDone(false);
-      setEmailCheckLoading(false);
-      return;
+      setEmailExists(false); setEmailCheckDone(false); setEmailCheckLoading(false); return;
     }
     setEmailCheckLoading(true);
     const timer = setTimeout(async () => {
@@ -64,12 +58,8 @@ const Login: React.FC = () => {
         const { db } = await import('../lib/firebase');
         const { getDoc, doc } = await import('firebase/firestore');
         const userDoc = await getDoc(doc(db, 'users', email.trim().toLowerCase()));
-        setEmailExists(userDoc.exists());
-        setEmailCheckDone(true);
-      } catch {
-        setEmailExists(false);
-        setEmailCheckDone(false);
-      }
+        setEmailExists(userDoc.exists()); setEmailCheckDone(true);
+      } catch { setEmailExists(false); setEmailCheckDone(false); }
       setEmailCheckLoading(false);
     }, 800);
     return () => clearTimeout(timer);
@@ -78,35 +68,27 @@ const Login: React.FC = () => {
   const handleSendOTP = async () => {
     setError('');
     if (!name.trim() || !collegeId.trim() || !institute.trim() || !email.trim()) {
-      setError('All fields are required.');
-      return;
+      setError('All fields are required.'); return;
     }
     setLoading(true);
     try {
       const response = await fetch(`${API}/auth/send-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim().toLowerCase(), name: name.trim(), collegeId: collegeId.trim(), role, institute: institute.trim() })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Failed to send OTP');
-      setOtp(['', '', '', '', '', '']);
-      setIsDirectLogin(false);
-      // TEMPORARY: capture devOTP for testing display
-      const backendOTP = data.data?.devOTP || data.devOTP;
-      if (backendOTP) setGeneratedOTP(String(backendOTP));
+      setOtp(['', '', '', '', '', '']); setIsDirectLogin(false);
       setStep('otp');
     } catch (err: any) {
-      setError(err.message || 'Failed to send OTP. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+      if (isNetworkError(err)) setError('Server is offline. Please start the backend.');
+      else setError(err.message || 'Failed to send OTP. Please try again.');
+    } finally { setLoading(false); }
   };
 
   const handleDirectLogin = async () => {
     if (!directLoginEmail.trim()) { setDirectLoginError('Please enter your email.'); return; }
-    setDirectLoginLoading(true);
-    setDirectLoginError('');
+    setDirectLoginLoading(true); setDirectLoginError('');
     try {
       const { db } = await import('../lib/firebase');
       const { getDoc, doc } = await import('firebase/firestore');
@@ -114,38 +96,29 @@ const Login: React.FC = () => {
       const userDoc = await getDoc(doc(db, 'users', normalizedEmail));
       if (!userDoc.exists()) {
         setDirectLoginError('No account found with this email. Please sign up first.');
-        setDirectLoginLoading(false);
-        return;
+        setDirectLoginLoading(false); return;
       }
       const userData = userDoc.data();
-      // Send OTP via backend and use the OTP it generates
       const response = await fetch(`${API}/auth/send-otp`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: normalizedEmail, name: userData.name, collegeId: userData.collegeId, role: userData.role, institute: userData.institute })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Failed to send OTP');
-      setName(userData.name || '');
-      setCollegeId(userData.collegeId || '');
-      setInstitute(userData.institute || '');
-      setEmail(normalizedEmail);
+      setName(userData.name || ''); setCollegeId(userData.collegeId || '');
+      setInstitute(userData.institute || ''); setEmail(normalizedEmail);
       localStorage.setItem('campusvoice_role', userData.role || 'student');
-      setIsDirectLogin(true);
-      setOtp(['', '', '', '', '', '']);
-      // TEMPORARY: capture devOTP for testing display
-      const backendOTP = data.data?.devOTP || data.devOTP;
-      if (backendOTP) setGeneratedOTP(String(backendOTP));
+      setIsDirectLogin(true); setOtp(['', '', '', '', '', '']);
       setStep('otp');
-    } catch {
-      setDirectLoginError('Something went wrong. Please try again.');
-    } finally {
-      setDirectLoginLoading(false);
-    }
+    } catch (err: any) {
+      if (isNetworkError(err)) setDirectLoginError('Server is offline. Please start the backend.');
+      else setDirectLoginError('Something went wrong. Please try again.');
+    } finally { setDirectLoginLoading(false); }
   };
 
   const handleVerifyOTP = async () => {
     setError('');
-    const enteredOTP = Array.isArray(otp) ? otp.join('').trim() : String(otp).trim();
+    const enteredOTP = otp.join('').trim();
     if (enteredOTP.length !== 6) { setError('Please enter the complete 6-digit OTP.'); return; }
     if (!/^\d{6}$/.test(enteredOTP)) { setError('OTP must contain only numbers.'); return; }
     setLoading(true);
@@ -158,24 +131,14 @@ const Login: React.FC = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        const token = data.data?.token;
-        const userData = data.data?.user;
+        const token = data.data?.token; const userData = data.data?.user;
         if (!token) throw new Error('No token received');
-        const userObj = {
-          id: normalizedEmail, name: userData?.name || name.trim(),
-          email: normalizedEmail, collegeId: userData?.collegeId || collegeId.trim(),
-          institute: userData?.institute || institute.trim(),
-          role: (userData?.role || role) as 'student' | 'faculty',
-          points: userData?.points || 0, level: userData?.level || 1, badges: userData?.badges || [],
-        };
-        localStorage.setItem('token', token);
-        login(userObj);
-        setSuccess(true);
+        const userObj = { id: normalizedEmail, name: userData?.name || name.trim(), email: normalizedEmail, collegeId: userData?.collegeId || collegeId.trim(), institute: userData?.institute || institute.trim(), role: (userData?.role || role) as 'student' | 'faculty', points: userData?.points || 0, level: userData?.level || 1, badges: userData?.badges || [] };
+        localStorage.setItem('token', token); login(userObj); setSuccess(true);
         setTimeout(() => navigate('/feed'), 800);
-      } else {
-        throw new Error(data.message || 'Invalid OTP');
-      }
-    } catch {
+      } else { throw new Error(data.message || 'Invalid OTP'); }
+    } catch (err: any) {
+      if (isNetworkError(err)) { setError('Server is offline. Please start the backend.'); setLoading(false); return; }
       // Firebase fallback
       try {
         const { db } = await import('../lib/firebase');
@@ -186,265 +149,265 @@ const Login: React.FC = () => {
         const expiry = stored.expiresAt?.toDate?.() || new Date(stored.expiresAt);
         if (expiry < new Date()) { setError('OTP expired. Please resend.'); setLoading(false); return; }
         if (enteredOTP !== stored.otp) { setError('Invalid OTP. Please try again.'); setLoading(false); return; }
-
         if (isDirectLogin) {
-          // Load full existing user data
           const userDoc = await getDoc(doc(db, 'users', normalizedEmail));
           const fullUser = { id: normalizedEmail, ...userDoc.data() } as any;
           await deleteDoc(doc(db, 'otps', normalizedEmail));
           localStorage.setItem('token', 'firebase_' + normalizedEmail);
           login({ ...fullUser, role: fullUser.role as 'student' | 'faculty' });
-          setSuccess(true);
-          setTimeout(() => navigate('/feed'), 800);
+          setSuccess(true); setTimeout(() => navigate('/feed'), 800);
         } else {
-          await setDoc(doc(db, 'users', normalizedEmail), {
-            name: name.trim(), collegeId: collegeId.trim(), institute: institute.trim(),
-            email: normalizedEmail, role: resolvedRole, isVerified: true,
-            points: 0, level: 1, levelTitle: 'Newcomer', badges: [], complaintsRaised: 0,
-            createdAt: new Date().toISOString()
-          }, { merge: true });
+          await setDoc(doc(db, 'users', normalizedEmail), { name: name.trim(), collegeId: collegeId.trim(), institute: institute.trim(), email: normalizedEmail, role: resolvedRole, isVerified: true, points: 0, level: 1, levelTitle: 'Newcomer', badges: [], complaintsRaised: 0, createdAt: new Date().toISOString() }, { merge: true });
           await deleteDoc(doc(db, 'otps', normalizedEmail));
-          const userObj = {
-            id: normalizedEmail, name: name.trim(), email: normalizedEmail,
-            collegeId: collegeId.trim(), institute: institute.trim(),
-            role: resolvedRole as 'student' | 'faculty', points: 0, level: 1, badges: [],
-          };
-          localStorage.setItem('token', 'firebase_' + normalizedEmail);
-          login(userObj);
-          setSuccess(true);
+          const userObj = { id: normalizedEmail, name: name.trim(), email: normalizedEmail, collegeId: collegeId.trim(), institute: institute.trim(), role: resolvedRole as 'student' | 'faculty', points: 0, level: 1, badges: [] };
+          localStorage.setItem('token', 'firebase_' + normalizedEmail); login(userObj); setSuccess(true);
           setTimeout(() => navigate('/feed'), 800);
         }
-      } catch {
-        setError('Verification failed. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
+      } catch { setError('Verification failed. Please try again.'); }
+    } finally { setLoading(false); }
   };
 
   const handleResendOTP = async () => {
-    setOtp(['', '', '', '', '', '']);
-    setError('');
+    setOtp(['', '', '', '', '', '']); setError('');
+    setResendCountdown(30);
     await (isDirectLogin ? handleDirectLogin : handleSendOTP)();
     setTimeout(() => otpRefs.current[0]?.focus(), 100);
   };
 
-  const inputStyle: React.CSSProperties = {
-    background: '#F0F9FF', border: '1.5px solid #E5E7EB', borderRadius: 10,
-    padding: '12px 16px', width: '100%', fontSize: 14, color: '#111827',
-    outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s',
-  };
-  const labelStyle: React.CSSProperties = {
-    fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6, display: 'block',
-  };
+  const inputCls = "w-full h-[44px] bg-white/10 border border-white/20 text-white rounded-xl pl-11 pr-4 placeholder:text-white/40 outline-none focus:border-purple-400 focus:bg-white/20 transition-all text-sm";
+  const labelCls = "block text-[11px] font-bold uppercase tracking-widest text-white/60 mb-1.5";
 
   return (
-    <div style={{ background: 'linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 100%)', minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', top: -150, right: -150, width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.15), rgba(168,85,247,0.08), transparent)', filter: 'blur(80px)', pointerEvents: 'none', zIndex: 0 }} />
-      <div style={{ position: 'absolute', bottom: -150, left: -150, width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.12), rgba(168,85,247,0.06), transparent)', filter: 'blur(80px)', pointerEvents: 'none', zIndex: 0 }} />
+    <div
+      className="h-screen relative overflow-hidden"
+      style={{
+        backgroundImage: "url('/campus-bg.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        fontFamily: 'Inter, sans-serif',
+      }}
+    >
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/40 z-0" />
 
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: 20 }}>
-        <div style={{ background: '#FFFFFF', border: '1px solid #F3F4F6', borderRadius: 20, padding: 40, width: '100%', maxWidth: 420, boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
+      {/* Main content */}
+      <main className="relative z-10 flex flex-col items-center justify-center h-full px-4 overflow-y-auto py-4">
 
-          {/* Back */}
-          <button onClick={() => step === 'otp' ? setStep('form') : navigate('/')}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280', fontSize: 14, padding: 0, marginBottom: 16 }}>
-            <ArrowLeft size={16} /> Back
-          </button>
+        {/* Glassmorphism card */}
+        <div
+          className="w-full max-w-sm rounded-3xl p-5 border border-white/20"
+          style={{
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
+        >
 
-          {/* Role badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 20, background: role === 'student' ? '#FAF5FF' : '#F5F3FF', color: role === 'student' ? '#6D28D9' : '#7C3AED', fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
-            {role === 'student' ? <GraduationCap size={14} /> : <Briefcase size={14} />}
-            {role === 'student' ? 'Student' : 'Faculty'}
-          </div>
-
-          {/* FORM STEP */}
+          {/* SIGN UP FORM */}
           {step === 'form' && !showDirectLogin && (
             <>
-              <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Welcome to CampusVoice</h1>
-              <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 24px' }}>Sign in with your institute credentials</p>
+              {/* Back to role select */}
+              <button onClick={() => navigate('/')} className="flex items-center gap-1.5 text-white/60 hover:text-white text-sm mb-4 transition-colors">
+                <ArrowLeft size={16} /> Back
+              </button>
+              <div className="mb-4 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-purple-600 flex items-center justify-center text-xl mb-3">
+                  🏛️
+                </div>
+                <h2 className="text-white font-bold text-xl tracking-tight mb-1">Join CampusVoice</h2>
+                <p className="text-white/70 text-xs leading-relaxed">Empowering students to advocate for change.</p>
+              </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="space-y-3">
                 <div>
-                  <label style={labelStyle}>Full Name</label>
-                  <input value={name} onChange={e => { setName(e.target.value); setError(''); }} placeholder="Enter your full name" style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = '#7C3AED')} onBlur={e => (e.target.style.borderColor = '#E5E7EB')} />
-                </div>
-                <div>
-                  <label style={labelStyle}>College ID</label>
-                  <input value={collegeId} onChange={e => { setCollegeId(e.target.value); setError(''); }} placeholder="Enter your college ID" style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = '#7C3AED')} onBlur={e => (e.target.style.borderColor = '#E5E7EB')} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Institute Name</label>
-                  <input value={institute} onChange={e => { setInstitute(e.target.value); setError(''); }} placeholder="Enter your institute name" style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = '#7C3AED')} onBlur={e => (e.target.style.borderColor = '#E5E7EB')} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Email Address</label>
-                  <input ref={emailRef} value={email} onChange={e => { setEmail(e.target.value); setError(''); }} placeholder="you@example.com" type="email" style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = '#7C3AED')} onBlur={e => (e.target.style.borderColor = '#E5E7EB')} />
-
-                  {/* Email check states */}
-                  {emailCheckLoading && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, color: '#9CA3AF', fontSize: 12 }}>
-                      <Loader2 size={12} className="animate-spin" /> Checking email...
+                  <label className={labelCls}>Full Name</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/60">
+                      <User size={16} />
                     </div>
+                    <input value={name} onChange={e => { setName(e.target.value); setError(''); }} placeholder="Your full name" className={inputCls} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelCls}>College ID</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/60">
+                      <CreditCard size={16} />
+                    </div>
+                    <input value={collegeId} onChange={e => { setCollegeId(e.target.value); setError(''); }} placeholder="STU-2024-XXXX" className={inputCls} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Institute</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/60">
+                      <Building2 size={16} />
+                    </div>
+                    <input value={institute} onChange={e => { setInstitute(e.target.value); setError(''); }} placeholder="Your institute name" className={inputCls} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Email Address</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/60">
+                      <Mail size={16} />
+                    </div>
+                    <input value={email} onChange={e => { setEmail(e.target.value); setError(''); }} placeholder="you@university.edu" type="email" className={inputCls} />
+                  </div>
+                  {emailCheckLoading && (
+                    <p className="text-xs text-white/60 px-1 mt-1 flex items-center gap-1">
+                      <Loader2 size={11} className="animate-spin" /> Checking...
+                    </p>
                   )}
                   {!emailCheckLoading && emailExists && emailCheckDone && (
-                    <div style={{ background: '#FFF3CD', border: '1px solid #FFC107', borderRadius: 8, padding: '10px 14px', marginTop: 6, display: 'flex', alignItems: 'center', gap: 8, animation: 'fadeSlideUp 0.3s ease' }}>
-                      <AlertCircle size={16} style={{ color: '#D97706', flexShrink: 0 }} />
-                      <div>
-                        <span style={{ color: '#92400E', fontSize: 13, fontWeight: 500 }}>This email is already registered. </span>
-                        <button onClick={() => { setShowDirectLogin(true); setDirectLoginEmail(email); setTimeout(() => directLoginRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); }}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7C3AED', fontSize: 13, fontWeight: 600, textDecoration: 'underline', padding: 0 }}>
-                          Login directly instead →
+                    <div className="bg-red-500/20 border border-red-400/40 rounded-xl px-3 py-2 mt-2 flex items-start gap-2">
+                      <AlertCircle size={14} className="text-red-200 mt-0.5 shrink-0" />
+                      <p className="text-xs text-red-200">
+                        Already registered.{' '}
+                        <button onClick={() => { setShowDirectLogin(true); setDirectLoginEmail(email); }} className="font-bold underline text-purple-300">
+                          Login instead →
                         </button>
-                      </div>
+                      </p>
                     </div>
                   )}
                   {!emailCheckLoading && !emailExists && emailCheckDone && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, color: '#059669', fontSize: 12 }}>
-                      <CheckCircle2 size={12} /> New registration can proceed
-                    </div>
+                    <p className="text-xs text-green-400 px-1 mt-1 flex items-center gap-1">
+                      <CheckCircle2 size={11} /> New registration can proceed
+                    </p>
                   )}
                 </div>
 
                 {error && (
-                  <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '10px 14px', color: '#DC2626', fontSize: 13 }}>{error}</div>
+                  <div className="bg-red-500/20 border border-red-400/40 rounded-xl px-3 py-2 text-xs text-red-200 flex items-start gap-2">
+                    <AlertCircle size={13} className="shrink-0 mt-0.5" />{error}
+                  </div>
                 )}
 
-                <button onClick={handleSendOTP} disabled={loading || emailExists}
-                  title={emailExists ? 'This email is already registered. Please login directly.' : ''}
-                  style={{ width: '100%', background: '#7C3AED', color: 'white', fontWeight: 600, borderRadius: 10, padding: '14px', border: 'none', cursor: (loading || emailExists) ? 'not-allowed' : 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s', opacity: (loading || emailExists) ? 0.5 : 1 }}
-                  onMouseEnter={e => { if (!loading && !emailExists) (e.currentTarget.style.background = '#6D28D9') }}
-                  onMouseLeave={e => { (e.currentTarget.style.background = '#7C3AED') }}>
-                  {loading ? <><Loader2 size={16} className="animate-spin" /> Sending...</> : 'Send OTP'}
+                <button
+                  onClick={handleSendOTP}
+                  disabled={loading || emailExists}
+                  className="w-full h-[44px] bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {loading ? <><Loader2 size={16} className="animate-spin" /> Sending...</> : 'Create Account'}
                 </button>
+              </div>
 
-                {/* Already have account */}
-                <div style={{ textAlign: 'center', marginTop: 4 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: 13 }}>Already have an account? </span>
-                  <button onClick={() => { setShowDirectLogin(true); setTimeout(() => directLoginRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7C3AED', fontSize: 13, fontWeight: 500, textDecoration: 'underline', padding: 0 }}>
-                    Login directly
-                  </button>
-                </div>
+              <div className="mt-6 text-center">
+                <p className="text-white/70 text-sm">
+                  Already have an account?{' '}
+                  <button onClick={() => setShowDirectLogin(true)} className="text-purple-300 font-bold hover:underline">Login</button>
+                </p>
               </div>
             </>
           )}
 
-          {/* DIRECT LOGIN SECTION */}
+          {/* DIRECT LOGIN */}
           {step === 'form' && showDirectLogin && (
-            <div ref={directLoginRef} style={{ animation: 'fadeSlideUp 0.3s ease' }}>
-              <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Welcome Back!</h1>
-              <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 24px' }}>Enter your registered email to login</p>
+            <>
+              {/* Back to sign up */}
+              <button onClick={() => { setShowDirectLogin(false); setDirectLoginError(''); }} className="flex items-center gap-1.5 text-white/60 hover:text-white text-sm mb-4 transition-colors">
+                <ArrowLeft size={16} /> Back
+              </button>
+              <div className="mb-8 text-center">
+                <h2 className="text-white font-bold text-2xl tracking-tight mb-1">Welcome Back!</h2>
+                <p className="text-white/70 text-sm leading-relaxed">Sign in to continue your scholarly advocacy.</p>
+              </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="space-y-5">
                 <div>
-                  <label style={labelStyle}>Registered Email</label>
-                  <input value={directLoginEmail} onChange={e => { setDirectLoginEmail(e.target.value); setDirectLoginError(''); }} placeholder="you@example.com" type="email" style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = '#7C3AED')} onBlur={e => (e.target.style.borderColor = '#E5E7EB')} />
+                  <label className={labelCls} htmlFor="login-email">Email Address</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/60">
+                      <Mail size={16} />
+                    </div>
+                    <input
+                      id="login-email"
+                      value={directLoginEmail}
+                      onChange={e => { setDirectLoginEmail(e.target.value); setDirectLoginError(''); }}
+                      placeholder="name@university.edu"
+                      type="email"
+                      className={inputCls}
+                    />
+                  </div>
                 </div>
 
                 {directLoginError && (
-                  <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '10px 14px', color: '#DC2626', fontSize: 13 }}>{directLoginError}</div>
+                  <div className="bg-red-500/20 border border-red-400/40 rounded-xl px-3 py-2 text-xs text-red-200 flex items-start gap-2">
+                    <AlertCircle size={13} className="shrink-0 mt-0.5" />{directLoginError}
+                  </div>
                 )}
 
-                <button onClick={handleDirectLogin} disabled={directLoginLoading}
-                  style={{ width: '100%', background: '#7C3AED', color: 'white', fontWeight: 600, borderRadius: 10, padding: '14px', border: 'none', cursor: directLoginLoading ? 'not-allowed' : 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s', opacity: directLoginLoading ? 0.8 : 1 }}
-                  onMouseEnter={e => { if (!directLoginLoading) (e.currentTarget.style.background = '#6D28D9') }}
-                  onMouseLeave={e => { (e.currentTarget.style.background = '#7C3AED') }}>
-                  {directLoginLoading ? <><Loader2 size={16} className="animate-spin" /> Sending...</> : 'Send Login OTP'}
-                </button>
-
-                <button onClick={() => { setShowDirectLogin(false); setDirectLoginError(''); }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7C3AED', fontSize: 13, textAlign: 'center', padding: 0 }}>
-                  ← New user? Create account
+                <button
+                  onClick={handleDirectLogin}
+                  disabled={directLoginLoading}
+                  className="w-full h-[52px] bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl active:scale-[0.98] transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+                >
+                  {directLoginLoading ? <><Loader2 size={16} className="animate-spin" /> Sending...</> : 'Continue'}
                 </button>
               </div>
-            </div>
+
+              <div className="mt-8 text-center">
+                <p className="text-white/70 text-sm">
+                  Don't have an account?{' '}
+                  <button onClick={() => { setShowDirectLogin(false); setDirectLoginError(''); }} className="text-purple-300 font-bold hover:underline">Sign Up</button>
+                </p>
+              </div>
+            </>
           )}
 
           {/* OTP STEP */}
           {step === 'otp' && (
-            <div style={{ animation: 'fadeSlideUp 0.3s ease' }}>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>
-                {isDirectLogin ? `Welcome back, ${name}!` : 'Verify your email'}
-              </h1>
-              <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 20px' }}>
-                {isDirectLogin ? 'Enter the OTP sent to your email' : 'Enter the OTP to complete signup'}
-              </p>
-
-              <div style={{ background: '#F5F3FF', border: '1px solid #E9D5FF', borderRadius: 12, padding: 16, marginBottom: 20, textAlign: 'center' }}>
-                <p style={{ fontSize: 20, marginBottom: 6 }}>📧</p>
-                <p style={{ fontWeight: 600, color: '#7C3AED', fontSize: 15, marginBottom: 4 }}>OTP Sent Successfully!</p>
-                <p style={{ color: '#A855F7', fontSize: 13, margin: 0 }}>Please check your email inbox at</p>
-                <p style={{ fontWeight: 700, color: '#7C3AED', fontSize: 14, marginTop: 4, margin: '4px 0 0' }}>{email}</p>
-                <p style={{ color: '#9CA3AF', fontSize: 12, marginTop: 6, marginBottom: 0 }}>OTP expires in 5 minutes</p>
-                {/* TEMPORARY: OTP display for testing — remove before going live */}
-                {generatedOTP && (
-                  <div style={{ background: '#EEF2FF', border: '2px dashed #4F46E5', borderRadius: 12, padding: 16, textAlign: 'center', marginTop: 12 }}>
-                    <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 6, fontWeight: 500, margin: '0 0 6px' }}>Your OTP Code (Testing Only):</p>
-                    <p style={{ fontSize: 36, fontWeight: 800, color: '#4F46E5', letterSpacing: 8, margin: 0 }}>{generatedOTP}</p>
-                    <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6, marginBottom: 0 }}>⚠️ Remove this before going live</p>
-                  </div>
-                )}
+            <>
+              {/* Back to form */}
+              <button onClick={() => { setStep('form'); setError(''); setOtp(['','','','','','']); }} className="flex items-center gap-1.5 text-white/60 hover:text-white text-sm mb-4 transition-colors">
+                <ArrowLeft size={16} /> Back
+              </button>
+              <div className="mb-6 flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center mb-4">
+                  <Mail size={32} className="text-purple-300" />
+                </div>
+                <h1 className="text-white text-2xl font-bold tracking-tight mb-2">Verify Your Email</h1>
+                <p className="text-white/70 text-sm px-2 leading-relaxed">
+                  We've sent a 6-digit code to{' '}
+                  <span className="font-bold text-purple-300">{email}</span>
+                </p>
               </div>
 
-              <label style={labelStyle}>Enter OTP</label>
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'center', margin: '20px 0' }}>
-                {[0, 1, 2, 3, 4, 5].map((index) => (
+              
+
+              <div className="flex justify-between gap-1.5 mb-5">
+                {[0, 1, 2, 3, 4, 5].map(i => (
                   <input
-                    key={index}
-                    ref={el => { otpRefs.current[index] = el; }}
+                    key={i}
+                    ref={el => { otpRefs.current[i] = el; }}
                     type="tel"
                     inputMode="numeric"
                     pattern="[0-9]*"
                     maxLength={1}
-                    value={otp[index] || ''}
-                    style={{ width: 48, height: 56, textAlign: 'center', fontSize: 22, fontWeight: 700, background: '#F8F9FA', border: `1.5px solid ${otp[index] ? '#7C3AED' : '#E5E7EB'}`, borderRadius: 12, color: '#111827', outline: 'none', cursor: 'text', caretColor: 'transparent' }}
-                    onFocus={e => { e.target.style.borderColor = '#7C3AED'; e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.1)'; }}
-                    onBlur={e => { e.target.style.borderColor = otp[index] ? '#7C3AED' : '#E5E7EB'; e.target.style.boxShadow = 'none'; }}
+                    value={otp[i] || ''}
+                    className="w-full h-12 bg-white/10 border border-white/20 text-white font-bold text-xl text-center rounded-xl focus:border-purple-400 focus:bg-white/20 outline-none transition-all"
                     onChange={e => {
-                      const raw = e.target.value.replace(/\D/g, '');
-                      if (!raw) return;
-                      // Take only the first digit from whatever was typed
-                      const newDigit = raw[0];
-                      const newOtp = [...otp];
-                      newOtp[index] = newDigit;
-                      setOtp(newOtp);
-                      setError('');
-                      if (index < 5) setTimeout(() => otpRefs.current[index + 1]?.focus(), 0);
+                      const raw = e.target.value.replace(/\D/g, ''); if (!raw) return;
+                      const newOtp = [...otp]; newOtp[i] = raw[0]; setOtp(newOtp); setError('');
+                      if (i < 5) setTimeout(() => otpRefs.current[i + 1]?.focus(), 0);
                     }}
                     onKeyDown={e => {
                       if (e.key === 'Backspace') {
                         e.preventDefault();
                         const newOtp = [...otp];
-                        if (newOtp[index] !== '') {
-                          newOtp[index] = '';
-                          setOtp(newOtp);
-                        } else if (index > 0) {
-                          newOtp[index - 1] = '';
-                          setOtp(newOtp);
-                          otpRefs.current[index - 1]?.focus();
-                        }
-                      } else if (e.key === 'ArrowLeft' && index > 0) {
-                        e.preventDefault();
-                        otpRefs.current[index - 1]?.focus();
-                      } else if (e.key === 'ArrowRight' && index < 5) {
-                        e.preventDefault();
-                        otpRefs.current[index + 1]?.focus();
-                      } else if (e.key === 'Enter') {
-                        handleVerifyOTP();
-                      }
+                        if (newOtp[i]) { newOtp[i] = ''; setOtp(newOtp); }
+                        else if (i > 0) { newOtp[i - 1] = ''; setOtp(newOtp); otpRefs.current[i - 1]?.focus(); }
+                      } else if (e.key === 'Enter') handleVerifyOTP();
                     }}
                     onPaste={e => {
                       e.preventDefault();
                       const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
                       if (pasted.length > 0) {
                         const newOtp = ['', '', '', '', '', ''];
-                        for (let i = 0; i < pasted.length; i++) newOtp[i] = pasted[i];
+                        for (let j = 0; j < pasted.length; j++) newOtp[j] = pasted[j];
                         setOtp(newOtp);
                         setTimeout(() => otpRefs.current[Math.min(pasted.length, 5)]?.focus(), 0);
                       }
@@ -454,37 +417,48 @@ const Login: React.FC = () => {
               </div>
 
               {error && (
-                <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '10px 14px', color: '#DC2626', fontSize: 13, marginBottom: 16 }}>{error}</div>
+                <div className="bg-red-500/20 border border-red-400/40 rounded-xl px-3 py-2 text-xs text-red-200 mb-4 flex items-start gap-2">
+                  <AlertCircle size={13} className="shrink-0 mt-0.5" />{error}
+                </div>
               )}
 
               {success ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 14, background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 10, color: '#16a34a', fontWeight: 600 }}>
+                <div className="flex items-center justify-center gap-2 py-4 bg-green-500/20 border border-green-400/40 rounded-xl text-green-300 font-semibold text-sm">
                   <CheckCircle2 size={18} /> Verified! Redirecting...
                 </div>
               ) : (
-                <button onClick={handleVerifyOTP} disabled={loading}
-                  style={{ width: '100%', background: '#7C3AED', color: 'white', fontWeight: 600, borderRadius: 10, padding: '14px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s', opacity: loading ? 0.8 : 1 }}
-                  onMouseEnter={e => { if (!loading) (e.currentTarget.style.background = '#6D28D9') }}
-                  onMouseLeave={e => { (e.currentTarget.style.background = '#7C3AED') }}>
+                <button
+                  onClick={handleVerifyOTP}
+                  disabled={loading}
+                  className="w-full h-[52px] bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                >
                   {loading ? <><Loader2 size={16} className="animate-spin" /> Verifying...</> : 'Verify & Login'}
                 </button>
               )}
 
-              <button onClick={handleResendOTP}
-                style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: '#7C3AED', fontSize: 13, marginTop: 12, textDecoration: 'underline' }}>
-                Resend OTP
-              </button>
-            </div>
+              <div className="mt-6 text-center">
+                <p className="text-white/60 text-sm mb-2">Didn't receive code?</p>
+                {resendCountdown > 0 ? (
+                  <p className="text-white/40 text-sm">Resend in {resendCountdown}s...</p>
+                ) : (
+                  <button onClick={handleResendOTP} className="text-purple-300 font-semibold hover:underline text-sm">
+                    Resend Code →
+                  </button>
+                )}
+              </div>
+            </>
           )}
         </div>
-      </div>
 
-      <style>{`
-        @keyframes fadeSlideUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+        {/* Footer links */}
+        <div className="mt-8 flex justify-center gap-6">
+          {['Privacy Policy', 'Terms of Service', 'Help'].map(l => (
+            <span key={l} className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40 cursor-pointer hover:text-white/70 transition-colors">
+              {l}
+            </span>
+          ))}
+        </div>
+      </main>
     </div>
   );
 };

@@ -50,6 +50,9 @@ const MyComplaints: React.FC = () => {
     fetchData();
   }, [user?.id, tab]);
 
+  const archivedCount = complaints.filter(c => c.archivedFromFeed).length;
+  const visibleComplaints = complaints.filter(c => !c.archivedFromFeed);
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <div className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border px-4 py-3">
@@ -90,13 +93,19 @@ const MyComplaints: React.FC = () => {
           </div>
         )}
 
-        {!loading && complaints.length === 0 && (
+        {!loading && visibleComplaints.length === 0 && archivedCount === 0 && (
           <div className="text-center py-16">
             <p className="text-muted-foreground">No complaints found</p>
           </div>
         )}
 
-        {!loading && complaints.map(c => (
+        {!loading && archivedCount > 0 && (
+          <div style={{ background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', color: '#6D28D9' }}>
+            ?? {archivedCount} resolved complaint{archivedCount !== 1 ? 's' : ''} archived. Check Authorities app for full history.
+          </div>
+        )}
+
+        {!loading && visibleComplaints.map(c => (
           <div
             key={c.id}
             onClick={() => navigate(`/complaint/${c.id}`)}
@@ -119,15 +128,11 @@ const MyComplaints: React.FC = () => {
               {c.status === 'resolved' && !c.satisfactionRating && (
                 <div
                   onClick={e => { e.stopPropagation(); navigate(`/complaint/${c.id}`); }}
-                  style={{
-                    background: '#FEF3C7', border: '1px solid #FCD34D',
-                    borderRadius: '8px', padding: '8px 12px', marginTop: '4px',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px'
-                  }}
+                  style={{ background: '#FEF3C7', border: '1px solid #FCD34D', borderRadius: '8px', padding: '8px 12px', marginTop: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
-                  <span style={{ fontSize: '16px' }}>⭐</span>
+                  <span style={{ fontSize: '16px' }}>?</span>
                   <p style={{ fontSize: '13px', color: '#92400E', fontWeight: 600, margin: 0 }}>
-                    Rate the resolution — tap to give feedback
+                    Rate the resolution � tap to give feedback
                   </p>
                 </div>
               )}

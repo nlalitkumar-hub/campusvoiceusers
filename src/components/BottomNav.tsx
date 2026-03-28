@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, PlusCircle, BarChart3, Trophy, User } from 'lucide-react';
+import { Home, BarChart3, Plus, Trophy, User } from 'lucide-react';
 
 const BottomNav: React.FC = () => {
   const navigate = useNavigate();
@@ -9,37 +9,46 @@ const BottomNav: React.FC = () => {
   const items = [
     { icon: Home, label: 'Feed', path: '/feed' },
     { icon: BarChart3, label: 'Analytics', path: '/analytics' },
-    { icon: PlusCircle, label: 'Raise', path: '/raise-complaint', isCenter: true },
+    { label: 'Raise', path: '/raise-complaint', isCenter: true },
     { icon: Trophy, label: 'Board', path: '/leaderboard' },
     { icon: User, label: 'Profile', path: '/profile' },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
-      <div className="flex items-center justify-around px-2 py-1">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100"
+      style={{ height: 64, boxShadow: '0 -4px 12px rgba(0,0,0,0.05)' }}
+    >
+      <div className="flex items-center justify-around h-full px-2">
         {items.map((item) => {
           const isActive = location.pathname === item.path;
+
           if (item.isCenter) {
             return (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="flex flex-col items-center justify-center -mt-5 bg-primary rounded-full w-14 h-14 shadow-indigo transition-transform active:scale-95"
+                className="flex flex-col items-center justify-center -mt-5 w-14 h-14 rounded-full active:scale-95 transition-transform"
+                style={{
+                  background: '#7C3AED',
+                  boxShadow: '0 4px 16px rgba(124,58,237,0.4)',
+                }}
               >
-                <item.icon className="w-6 h-6 text-primary-foreground" />
+                <Plus size={26} color="white" strokeWidth={2.5} />
               </button>
             );
           }
+
+          const Icon = item.icon!;
           return (
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-colors ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`}
+              className="flex flex-col items-center justify-center py-2 px-3 gap-0.5 transition-colors"
+              style={{ color: isActive ? '#7C3AED' : '#9CA3AF' }}
             >
-              <item.icon className="w-5 h-5" />
-              <span className="text-[10px] mt-0.5 font-medium">{item.label}</span>
+              <Icon size={20} />
+              <span className="text-[10px] font-medium uppercase tracking-widest mt-0.5">{item.label}</span>
             </button>
           );
         })}
