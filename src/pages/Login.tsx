@@ -31,7 +31,6 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
-  const [otpForTesting, setOtpForTesting] = useState('');
 
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -79,7 +78,6 @@ const Login: React.FC = () => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Failed to send OTP');
-      setOtpForTesting(data.data?.otp || data.otp || '');
       setOtp(['', '', '', '', '', '']); setIsDirectLogin(false);
       setStep('otp');
     } catch (err: any) {
@@ -112,7 +110,6 @@ const Login: React.FC = () => {
       setInstitute(userData.institute || ''); setEmail(normalizedEmail);
       localStorage.setItem('campusvoice_role', userData.role || 'student');
       setIsDirectLogin(true); setOtp(['', '', '', '', '', '']);
-      setOtpForTesting(data.data?.otp || data.otp || '');
       setStep('otp');
     } catch (err: any) {
       console.error('Error:', err);
@@ -382,12 +379,6 @@ const Login: React.FC = () => {
                   <span className="font-bold text-purple-300">{email}</span>
                 </p>
               </div>
-
-              {otpForTesting && (
-                <div style={{ backgroundColor: '#FEF3C7', border: '1px solid #F59E0B', borderRadius: '8px', padding: '12px', marginTop: '8px', textAlign: 'center' }}>
-                  <p style={{ fontWeight: 'bold', color: '#92400E', fontSize: '16px' }}>Test OTP: {otpForTesting}</p>
-                </div>
-              )}
 
               <div className="flex justify-between gap-1.5 mb-5">
                 {[0, 1, 2, 3, 4, 5].map(i => (

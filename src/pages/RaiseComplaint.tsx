@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { uploadImage } from '@/lib/cloudinary';
 import { createComplaint, updateUserPoints } from '@/lib/firestore';
 import { POINT_VALUES } from '@/lib/gamification';
+import { BASE_URL, PYTHON_AI_URL } from '@/lib/api';
 
 const CATEGORIES = ['Infrastructure', 'Safety', 'Technology', 'Academic', 'Health', 'Hygiene', 'Other'];
 
@@ -77,7 +78,7 @@ const RaiseComplaint: React.FC = () => {
     // Primary: Python AI triage backend
     try {
       const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 35000);
-      const res = await fetch(`${import.meta.env.VITE_PYTHON_AI_URL || 'http://localhost:8000'}/api/verify-image`, {
+      const res = await fetch(`${PYTHON_AI_URL}/api/verify-image`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64, description: `${title}. ${description}`, category, location: 'Vellore Institute of Science and Technology, Chennai Campus' }),
         signal: controller.signal
@@ -95,7 +96,7 @@ const RaiseComplaint: React.FC = () => {
     // Fallback: Node backend
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/complaints/verify`, {
+      const res = await fetch(`${BASE_URL}/complaints/verify`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ imageBase64, description: `${title}. ${description}`, category })
       });
@@ -123,7 +124,7 @@ const RaiseComplaint: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const base64Data = image!.replace(/^data:image\/\w+;base64,/, '');
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/complaints/create`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) }, body: JSON.stringify({ ...form, imageBase64: base64Data, submittedBy: user.id, submittedByName: user.name, institute: user.institute, coordinates: userLocation }) });
+      const res = await fetch(`${BASE_URL}/complaints/create`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) }, body: JSON.stringify({ ...form, imageBase64: base64Data, submittedBy: user.id, submittedByName: user.name, institute: user.institute, coordinates: userLocation }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Submission failed');
       updateUser({ points: (user.points || 0) + POINT_VALUES.RAISE_COMPLAINT + POINT_VALUES.AI_VERIFIED });

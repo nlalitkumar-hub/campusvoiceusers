@@ -1,4 +1,11 @@
-const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api'
+// Base URLs — driven by .env / .env.production
+// Local dev:  VITE_API_URL=http://localhost:5000
+// Production: VITE_API_URL=https://campusvoicebackend.onrender.com
+export const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api'
+
+// Local dev:  VITE_PYTHON_AI_URL=http://localhost:8000
+// Production: VITE_PYTHON_AI_URL=https://campusvoiceusersai.onrender.com
+export const PYTHON_AI_URL = import.meta.env.VITE_PYTHON_AI_URL || 'http://localhost:8000'
 
 const getHeaders = () => ({
   'Content-Type': 'application/json',
@@ -16,6 +23,23 @@ const request = async (endpoint: string, options: RequestInit = {}) => {
     return data
   } catch (error: any) {
     console.error(`API Error [${endpoint}]:`, error)
+    throw error
+  }
+}
+
+// Python AI — separate base, no auth header needed
+export const aiRequest = async (endpoint: string, body: object) => {
+  try {
+    const response = await fetch(`${PYTHON_AI_URL}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+    const data = await response.json()
+    if (!response.ok) throw new Error(data.message || data.detail || 'AI request failed')
+    return data
+  } catch (error: any) {
+    console.error(`AI Error [${endpoint}]:`, error)
     throw error
   }
 }
@@ -48,8 +72,4 @@ export const getPersonalAnalyticsAPI = () => request('/analytics/personal')
 export const getNotificationsAPI = () => request('/notifications')
 export const markNotificationReadAPI = (id: string) => request(`/notifications/${id}/read`, { method: 'POST' })
 
-// Faculty
-export const getFacultyDashboardAPI = () => request('/faculty/dashboard')
-export const facultyReopenComplaintAPI = (id: string, body: object) =>
-  request(`/complaints/${id}/faculty-reopen`, { method: 'POST', body: JSON.stringify(body) })
-export const getEscalatedComplaintsAPI = () => request('/complaints/escalated')
+

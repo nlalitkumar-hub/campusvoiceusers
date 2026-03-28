@@ -187,18 +187,6 @@ const Feed: React.FC = () => {
         onCloseNotifications={() => setShowNotifications(false)}
       />
 
-      {/* Faculty Dashboard shortcut */}
-      {user?.role === 'faculty' && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 16px', background: 'white', borderBottom: '1px solid #F3F4F6' }}>
-          <button
-            onClick={() => navigate('/faculty-dashboard')}
-            style={{ padding: '6px 14px', background: '#7C3AED', color: 'white', border: 'none', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
-          >
-            Dashboard
-          </button>
-        </div>
-      )}
-
       {/* Search bar */}
       {showSearch && (
         <div className="px-4 pt-3 pb-1 bg-white border-b border-gray-100">

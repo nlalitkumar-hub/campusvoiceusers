@@ -17,11 +17,10 @@ export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
     otp: otpToStore, expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
     attempts: 0, createdAt: new Date().toISOString()
   })
-  console.log(`✅ OTP saved for ${email}: ${otpToStore}`)
-  console.log(`OTP for testing: ${otpToStore}`)
+  console.log(`✅ OTP saved for ${email}`)
   try { await sendOTPEmail(email, otpToStore, name) } catch (e: any) { console.error('Email failed (non-fatal):', e.message) }
 
-  return res.status(200).json(new ApiResponse(200, { message: `OTP sent to ${email}`, otp: otpToStore }, 'OTP sent successfully'))
+  return res.status(200).json(new ApiResponse(200, { message: `OTP sent to ${email}` }, 'OTP sent successfully'))
 })
 
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
