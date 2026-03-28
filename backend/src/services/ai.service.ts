@@ -22,13 +22,13 @@ export const verifyComplaint = async (imageBase64: string, description: string, 
     })
     clearTimeout(timeout)
     if (response.ok) {
-      const data = await response.json()
+      const data = await response.json() as any
       console.log('✅ Python AI triage used — specialist:', data.specialist_model)
       return { campusDetected: data.campusDetected, descriptionMatches: data.descriptionMatches, isReal: data.isReal, overallVerified: data.overallVerified, reason: data.reason }
     }
     // 400 = privacy violation or irrelevant image — propagate the error message
     if (response.status === 400) {
-      const err = await response.json()
+      const err = await response.json() as any
       const msg = err.detail?.message || err.message || 'Verification failed'
       return { campusDetected: false, descriptionMatches: false, isReal: false, overallVerified: false, reason: msg }
     }
